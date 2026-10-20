@@ -4,6 +4,24 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+NEW KERNEL BUILT AND TEMPORARILY BOOTED: CI39457341486 SUCCESS; artifact under
+research/cepheus/ci-ufs-kernel/kernel.development.sweet SHA256
+9b59a553ff76bf3d0a02a5741ef2b962b1378a6515c910b93b03505e08ded1fa.
+Buildtree under research/cepheus/ci-ufs-buildtree/buildtree.tgz. Verified its
+bsd/dev/sweet_ufs.c explicitly has su.writable=false, and kernel contains
+br_sha1_init plus portable sha1_init. Generated corrected payload using OLD
+console/no-UFS ADT first, to isolate SHA1 panic before storage testing.
+Current shim/out/cepheus-xnu/cepheus-xnu-boot.img is NOW 18448384 bytes,
+SHA256 b5addf68da12bd1d2137a889a07cfad7c1c2b92ae0550cdbc2a94b035f516ca2;
+this overwrites the earlier baseline image at that same path.
+Root recovery -> bootloader, productcepheus/unlockedyes checked, temporary
+fastboot boot: Sending18016KB OKAY0.393s, BootingOKAY0.219s, total0.623s.
+User screen report requested; PENDING. No partition writes. Current phone may
+remain in bare-metal XNU until user manually returns to recovery.
+Root-image build session3831 still active; source OS cached about3.14GB of4.73GB
+at last check, not yet actual rsync. Reclaimed NTFS temporary image space finally
+appeared; G now has~29.9GB free. Do not terminate WSL while building.
+
 LATEST ACTIVE SESSIONS (supersede old root-build notes below): CI39457341486
 building cepheus-ufs commit81a48d4; job118747538971. Phone is root RECOVERY,
 user confirmed and adb detects it. No new boot after the photographed panic.
