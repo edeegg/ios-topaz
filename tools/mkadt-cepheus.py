@@ -38,6 +38,8 @@ def main():
     parser.add_argument('--boot-mpidr', required=True, type=lambda s: int(s, 0),
                         help='must be confirmed with the CPU probe before boot')
     parser.add_argument('--out', required=True, type=Path)
+    parser.add_argument('--storage-read-only', action='store_true',
+                        help='include verified Mi 9 UFS map for the read-only kernel target')
     args = parser.parse_args()
     blob = args.live_dtb.read_bytes()
     nodes = fdt.parse_fdt(blob)
@@ -82,6 +84,12 @@ def main():
         parser.error('unexpected GIC layout')
     mkadt.HIGH_PHYS_BASE, mkadt.HIGH_MEM_SIZE = bank
     mkadt.GICD, mkadt.GICR = 0x17a00000, 0x17a60000
+    if args.storage_read_only:
+        ufs = nodes['/soc/ufshc@1d84000']
+        if (ufs.get('reg-names') != b'ufs_mem\0ufs_ice\0' or
+                struct.unpack('>4I', ufs['reg']) != (0x1d84000, 0x2500, 0x1d90000, 0x8000)):
+            parser.error('unexpected Mi 9 UFS register layout')
+        mkadt.UFS, mkadt.UFS_SIZE = 0x1d84000, 0x2500
     mkadt.FB, mkadt.FB_SIZE = ranges(nodes['/reserved-memory/cont_splash_region']['reg'])[0]
     mkadt.FB_W, mkadt.FB_H, mkadt.FB_STRIDE = 1080, 2340, 4320
     mkadt.TIMEBASE = int.from_bytes(nodes['/soc/timer']['clock-frequency'], 'big')
@@ -100,12 +108,14 @@ def main():
             setprop(child.children[0], 'compatible', b'qcom,kryo485\0qcom,kryo470\0ARM,v8\0')
         elif child.name == 'arm-io':
             child.children = [c for c in child.children if c.name not in ('wlan', 'disp0')]
-    root.children = [c for c in root.children if c.name != 'sweet-ufs']
+    if not args.storage_read_only:
+        root.children = [c for c in root.children if c.name != 'sweet-ufs']
     args.out.parent.mkdir(parents=True, exist_ok=True)
     result = adt.serialize(root)
     args.out.write_bytes(result)
     print(f'{args.out}: {len(result)} bytes; RAM {bank[0]:#x}+{bank[1]:#x}, MPIDR {args.boot_mpidr:#x}')
-    print('Candidate console ADT only: no UFS/WLAN/display service. Kernel port and CPU probe still required.')
+    print('Candidate ADT: ' + ('read-only UFS target; ' if args.storage_read_only else 'no UFS; ') +
+          'no WLAN/display service. Requires the matching Mi 9 kernel.')
 
 
 if __name__ == '__main__':

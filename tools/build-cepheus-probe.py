@@ -33,9 +33,13 @@ def main():
                         help='avoid framebuffer; reboot to fastboot after 5 seconds')
     parser.add_argument('--payload', type=Path,
                         help='validated mkpayload.py XNU console payload (boot MPIDR 0)')
+    parser.add_argument('--storage-read-only', action='store_true',
+                        help='accept UFS ADT only with the read-only cepheus kernel target')
     args = parser.parse_args()
     if args.payload and args.entry_test:
         parser.error('--payload and --entry-test are mutually exclusive')
+    if args.storage_read_only and not args.payload:
+        parser.error('--storage-read-only requires --payload')
     xnu_payload = None
     if args.payload:
         xnu_payload = args.payload.read_bytes()
@@ -63,9 +67,19 @@ def main():
         if (chosen.prop('dram-base') != struct.pack('<Q', phys) or
                 chosen.prop('dram-size') != struct.pack('<Q', mem) or
                 len(cpus.children) != 1 or cpus.children[0].prop('reg') != bytes(4) or
-                b'xiaomi,cepheus\0' not in tree.prop('compatible') or
-                any(c.name == 'sweet-ufs' for c in tree.children)):
-            parser.error('payload requires the cepheus single-CPU no-storage ADT')
+                b'xiaomi,cepheus\0' not in tree.prop('compatible')):
+            parser.error('payload requires the cepheus single-CPU ADT')
+        ufs_nodes = [c for c in tree.children if c.name == 'sweet-ufs']
+        if args.storage_read_only:
+            cmdline = xnu_payload[0x48:0x2a8].split(b'\0')[0].decode('ascii').split()
+            if (len(ufs_nodes) != 1 or
+                    ufs_nodes[0].prop('reg') != struct.pack('<QQ', 0x1d84000, 0x2500) or
+                    [a for a in cmdline if a.startswith('ufsrw=')] != ['ufsrw=0'] or
+                    [a for a in cmdline if a.startswith('ufsroot=')] != ['ufsroot=userdata'] or
+                    'rd=ufsroot0' not in cmdline):
+                parser.error('read-only Mi 9 UFS requires verified map and userdata boot arguments')
+        elif ufs_nodes:
+            parser.error('UFS ADT requires explicit --storage-read-only and the matching kernel')
     for tool in ('clang', 'ld.lld', 'llvm-objcopy'):
         if not shutil.which(tool):
             parser.error(f'{tool} not found on PATH')
@@ -92,7 +106,8 @@ def main():
         cursor += tree['size']
     if cursor != len(kernel):
         parser.error('unexpected data after appended DTBs')
-    variant = ('cepheus-xnu' if xnu_payload else
+    variant = ('cepheus-xnu-ufs-ro' if args.storage_read_only else
+               'cepheus-xnu' if xnu_payload else
                'cepheus-entry-probe' if args.entry_test else 'cepheus-probe')
     out = root / 'shim/out' / variant
     out.mkdir(parents=True, exist_ok=True)

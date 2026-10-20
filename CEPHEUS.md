@@ -1,5 +1,23 @@
 # Xiaomi Mi 9 (cepheus): initial bring-up
 
+## First observed XNU panic and next storage stage
+
+User photo 20261020_122256.jpg confirms XNU reached panic logging on hardware.
+Saved PC is sha1_init+0x34 (0xfffffe0007910b28), LR is the instruction after
+SHA1Init in IOPlatformExpertDevice::generatePlatformUUID (0xfffffe00079791dc),
+FAR0x28 with x22=0. Disassembly loads [x22,#0x28]: the absent corecrypto function
+table. Baseline0018 omitted the existing portable SHA1 patch0032. This is a real
+kernel failure before iOS, not a missing-filesystem-only symptom.
+
+New cepheus-ufs target stages0001-0034 plus forced read-only UFS, adding portable
+crypto/pthread/HFS and 64-bit DMA support. CI39457341486 is building commit81a48d4.
+The live FDT UFS reg-names are ufs_mem/ufs_ice, with regions 0x1d84000+0x2500
+and 0x1d90000+0x8000; only the first region is exposed. No ICE programming.
+mkadt-cepheus.py --storage-read-only enables that validated region. The boot
+builder requires matching explicit --storage-read-only, ufsrw=0, ufsroot=userdata,
+rd=ufsroot0; output is separated as shim/out/cepheus-xnu-ufs-ro/.
+This stage is for read-only storage discovery; it is not a validated iOS boot.
+
 ## Real XNU console build, 2026-10-20
 
 CI run: https://github.com/edeegg/ios-topaz/actions/runs/39454541376
