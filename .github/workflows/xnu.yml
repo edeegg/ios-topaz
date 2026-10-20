@@ -6,7 +6,7 @@ on:
       board:
         description: Target board (cepheus is single-CPU console bring-up only)
         type: choice
-        options: [topaz, cepheus]
+        options: [topaz, cepheus, cepheus-ufs]
         default: topaz
       macos_version:
         description: macOS release whose xnu to build (13.5 = xnu-8796, iOS 16 era)
@@ -37,7 +37,7 @@ env:
   MACOS_VERSION: ${{ inputs.macos_version || '13.5' }}
   KERNEL_CONFIG: ${{ inputs.kernel_config || 'DEVELOPMENT' }}
   MACHINE_CONFIG: ${{ inputs.machine_config || 'SWEET' }}
-  TARGET_BOARD: ${{ inputs.board || (github.ref_name == 'cepheus-bringup' && 'cepheus') || 'topaz' }}
+  TARGET_BOARD: ${{ inputs.board || (github.ref_name == 'cepheus-bringup' && 'cepheus-ufs') || 'topaz' }}
   # ccache: xnu is ~2000 compiles; a patch usually changes a few of them
   CCACHE_DIR: ${{ github.workspace }}/.ccache
   CCACHE_BASEDIR: ${{ github.workspace }}

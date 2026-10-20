@@ -4,6 +4,22 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+NEW HARDWARE EVIDENCE: user supplied phone photo showing a real XNU panic,
+not merely a shim/black screen. Readable saved PC is consistent with sha1_init
+0xfffffe0007910b28 (ldr x20,[x22,#0x28]), LR 0xfffffe00079791dc in
+IOPlatformExpertDevice::generatePlatformUUID immediately after SHA1Init; FAR0x28,
+x22=0. Missing g_crypto_funcs in baseline0018 is the direct cause. Existing
+patch0032 supplies portable SHA1; it was excluded by the console-only cutoff.
+Next target cepheus-ufs stages0001-0034 (pthread/portablecrypto/HFS/UFS) plus a
+final patch forcing su.writable=false. No input/GPIO/modem drivers. Use UFS
+only after its correct Mi9 map is explicitly enabled in ADT. Compile success
+does not establish boot beyond this panic; do not claim iOS only needs flashing.
+
+Actual iOS root image build RUNNING in exec session79050, log
+research/windows-builder/ios-root-build.log. 14GiB output exists but NOT yet
+verified; mkfs.hfsplus was still formatting it at last check. Do NOT flash an
+incomplete image. WSL RAM6GB/swap0 and all large output remains on G.
+
 User requested another boot. Reconfirmed root recovery product cepheus, same
 XNU boot image SHA256 60dd4e4f...; rebooted to bootloader, rechecked product
 cepheus and unlockedyes. Repeated temporary fastboot boot: Sending17488KB
