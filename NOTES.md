@@ -22,6 +22,7 @@ tests pass. No CI needed for this bare-metal diagnostic. No hardware boot or
 device command was issued in this compilation turn. NEXT: verify bootloader
 state and test temporary stage-0 boot, then use measured CPU information to
 continue the XNU hardware port. This milestone supersedes compiler blocker below.
+Implementation and build fix committed locally as `eeb0dbf` (not pushed).
 
 - Initial HEAD was `3eacb48`; no
   pre-existing worktree modifications observed. Original remote MakrSas/ios-topaz.
