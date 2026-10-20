@@ -4,6 +4,25 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+CONVERSION FINISHED SUCCESSFULLY: session81834 exit0. Sparse file is
+/root/cepheus-ios-root/ios16-cepheus-root-20H392.simg, size12145388148 bytes.
+CURRENT ACTIVE VERIFICATION: exec session68200, Linux PID94, running
+python3 tools/verify-android-sparse.py on that .simg with --sha256
+bb8f0acecfbb8e677d55c1f5114ef9e9c5399cc91edfd409a57fa91bab8fec08
+--size15032385536 --write-marker. Still reading at3.18GB last check, no pass
+or .verified marker yet. DO NOT flash until this exits0 and prints PASS.
+Cache guard session45733 remains active, hostfreeRAM4-5GB, Gfree7.86GB.
+Phone still fastboot, last productcepheus. No successful userdata flash yet.
+NEXT after hash PASS: python research/windows-builder/flash-sparse-userdata.py
+from Windows, track its session until all sparse writes and exit0. Avoid ANY
+other fastboot/adb command while flash process owns USB. Log ios-sparse-flash.log.
+Then optional recovery header/GPT readback and temporary boot the validated
+cfb335... cepheus-xnu-ios-boot.img (new guarded writable userland kernel).
+Stop cache guard after large I/O: wsl touch /root/cepheus-tools/stop-image-cache-guard,
+wait session45733 exit, then may wsl --shutdown to release hostRAM (not Windows
+reboot). WSL must stay running during UNC flash. Never claim iOS boots without
+actual screen/log evidence. Root filesystem preparation itself is fully verified.
+
 ACTIVE MEMORY GUARD: session45733 runs ignored guard-wsl-cache.py in Ubuntu;
 every5s drops CLEAN page cache when Cached+Buffers>2GiB, stop marker
 /root/cepheus-tools/stop-image-cache-guard. Stop it after conversion/verification/
