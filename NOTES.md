@@ -5,6 +5,22 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+DISPLAY FIX CI39515071399 SUCCESS. Kernel saved ci-display-kernel SHA256
+201e1f4922a785270a92b74e9d6ebd63fc40cd472be0430c5b760da980b0cc74.
+Mutable sweet_console_muted atfffffe0007bd54c8 (__DATA), const cons_ops_index
+stillfffffe00071735e0. All real touch object undefinedimports resolve in this
+fullkernel. Fallback new displayfixed boot (NO TOUCH yet) built with logicalADT,
+noconsole1, no nativeflag: shim/out/cepheus-display-fixed-boot.img SHA256
+ ebbd2bd4328fea7f54f0ebadec7a13cfcb39645fd2480349c550458bc2c41988.
+Main cepheus-xnu-ios boot path currently same displayfixed, untiltouchCI replaces.
+Previous good136a/nativeconsole image preserved shim/out/cepheus-native-console-boot.img.
+Touch commit31c11e4 pushed; fullkernel CI39515787870 INPROGRESS. Await artifact
+then build with cepheustouch1 + noconsole1 + logicalADT. All new large data onG,
+WSL stayedoff. No phonewrites since user confirmed lockscreen; USB absent,
+user physical-state question pending. Don't boot/reflash without responsive link.
+
+
+
 TOUCH NOW PRIORITY per user "corrija no minimo o touch-screen". Recovery
 /proc/bus/input/devices confirms fts event4 at c80000.i2c/2-0049. Local WOA
 STFingerTipS521Touch.inf identifies STFT0521, ST FTS V521; binary .sys is NOT
