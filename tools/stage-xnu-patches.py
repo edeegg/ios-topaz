@@ -10,10 +10,12 @@ def main():
     parser.add_argument('--destination', type=Path, required=True)
     args = parser.parse_args()
     source = Path(__file__).resolve().parents[1] / 'xnu/patches'
-    cepheus_display = {'0061-cepheus-logical-display.patch', '0067-sweet-console-mute.patch'}
+    cepheus_display = {'0061-cepheus-logical-display.patch', '0067-sweet-console-mute.patch',
+                       '0068-cepheus-st-fts521-touch.patch'}
     selected = sorted(p for p in source.iterdir()
                       if p.suffix in ('.patch', '.sh') and
-                      ((args.board == 'topaz' and p.name != '0061-cepheus-logical-display.patch') or
+                      ((args.board == 'topaz' and p.name not in
+                        {'0061-cepheus-logical-display.patch', '0068-cepheus-st-fts521-touch.patch'}) or
                        (args.board == 'cepheus-ios' and p.name in cepheus_display) or
                        int(p.name[:4]) <= (59 if args.board == 'cepheus-ios' else
                                           34 if args.board == 'cepheus-ufs' else 18)))

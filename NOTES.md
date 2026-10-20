@@ -5,6 +5,38 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+TOUCH NOW PRIORITY per user "corrija no minimo o touch-screen". Recovery
+/proc/bus/input/devices confirms fts event4 at c80000.i2c/2-0049. Local WOA
+STFingerTipS521Touch.inf identifies STFT0521, ST FTS V521; binary .sys is NOT
+an XNU driver. Downloaded only reference C/headers from crdroid cepheus commit
+aa587668f86bd02ff1d7f825f5a89a886a84c8d8 into ignored touch-reference onG.
+LiveFDT: qupv3_se17 (wrapper2 S0, NOT wrapper1 S2!), regc80000+4000;
+GPIO55/56 south muxqup17=1, resetGPIO12north, IRQGPIO122south;
+vddio GPIO84north boot-on shared display, analogpm8150l_l1 at1.8V.
+GCC from real SM8150 source: vote52014 bits1/2/4, RCG1e148, branches1e004,
+1e008,1e144. ST protocol I2C0x49, regreadFA+32bit20000000 -> chip36:39;
+scanA0 00 01, FIFO86 event8bytes, enter13/move23/leave33. No Topaztouch reuse.
+Prepared0068-cepheus-st-fts521-touch.patch: isolated opt-in cepheustouch=1,
+30s delayed prototype; GENI FIFO helpers adapted from project's driver,
+no DMA/IRQ/PMIC or firmware upload. Refuses wrong/missing I2C firmware/busySE,
+wrongchipID; bounded transfer/abort/repeatedfailure releaseall. Forwards delta
+contacts to existing sweet_hid_touch, coordinates1080x2340 -> centered1125x2436.
+Native Windows clang produced REAL arm64 MachO object8872bytes, nofakebuiltins;
+actual C parser compiled/executed as native test DLL: PASS packedcoords,
+multifinger/release, badslot/bounds, resetcleanup. Patch applies actualCI59.
+Board staging isolation PASS fourtargets; original0060 touch/GPIO excluded.
+Prototype NOT HARDWARE VALIDATED, may need firmware/power integration.
+During recovery collection USB disappeared: debugfs mount+read attempted,
+/devmem c80068 read command also issued (no value returned); causality unknown.
+No more raw MMIO reads on recovery without clocks/access validation.
+ADB libusb restart no recovery, Windows AndroidADB interfaces Error; async
+question asking physical state pending. Don't claim touchscreen fixed.
+Display CI39515071399 build step SUCCESS at23:32UTC, packaging pending.
+Next finish CI, save artifacts, push touch prototype for full kernel link,
+then tempboot with logicalADT,noconsole1,cepheustouch1 once recovery returns.
+
+
+
 USER CONFIRMS LOCK SCREEN on136a image! GUI boot verified by user report.
 Remaining: console overwrites lockscreen, red status bar/native geometry,
 no physical touch/buttons, GPU/Metal, WiFi/BT/cellular/camera/fastcharge unported.
