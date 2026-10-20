@@ -4,6 +4,13 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+User requested another boot. Reconfirmed root recovery product cepheus, same
+XNU boot image SHA256 60dd4e4f...; rebooted to bootloader, rechecked product
+cepheus and unlockedyes. Repeated temporary fastboot boot: Sending17488KB
+OKAY0.382s, BootingOKAY0.221s, total0.616s. No flash or partition writes.
+Physical screen observation still required; bootloader acceptance alone is not
+proof of CPU/XNU execution.
+
 FINAL MILESTONE THIS TURN: CI39454541376 SUCCESS. Real kernel artifact downloaded
 to research/cepheus/ci-kernel/kernel.development.sweet, 16416640 bytes,
 SHA256 88e3e2beed5d25677d38ec839e44922fc8a2beefed7e26f2d42c737fa24b4081.
