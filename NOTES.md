@@ -4,6 +4,16 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+ACTIVE MEMORY GUARD: session45733 runs ignored guard-wsl-cache.py in Ubuntu;
+every5s drops CLEAN page cache when Cached+Buffers>2GiB, stop marker
+/root/cepheus-tools/stop-image-cache-guard. Stop it after conversion/verification/
+flash finishes by creating that marker. Do not leave it running indefinitely.
+Conversion grew WSL resident to5.9GB and host freeRAM~699MB; immediately set
+vm.dirty_background_bytes=67108864, vm.dirty_bytes=268435456, drop_caches=3.
+WSL returned to1.8GB resident, hostfree5GB. Guard now holds hostfree~4GB.
+This does not stop img2simg or alter filesystem data. Converter session81834
+still running at elapsed11m26s, sparse output5.09GB. Raw input remains intact.
+
 Sparse conversion session81834 is still RUNNING; image .simg was2.06GB at elapsed
 7m26s. Pass1 scanned entire raw; now writing sparse data. Do not start flash
 until converter exits0 and streaming expanded-hash verifier succeeds. Added
