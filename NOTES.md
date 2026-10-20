@@ -4,6 +4,17 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+FIRST GUARDED WRITABLE IOS KERNEL BOOT NOW SENT: user returned recovery. adb
+productcepheus; readback sda33 first4096bytes EXACTLY matches expected HFSX
+prefix; primary+secondary GPT EXACTLY match preserved backups. Installation
+header and unchanged partition table independently confirmed after flashing.
+Recovery->bootloader, productcepheus/unlockedyes checked, cfb335... image hash
+verified. Temporary fastboot boot shim/out/cepheus-xnu-ios/cepheus-xnu-ios-boot.img:
+Sending18204KB OKAY0.400s, BootingOKAY0.299s,total0.710s. This IS the new
+userland target with ufsrw=1 and exactuserdatawriteguard, unlike earlier RO image.
+Await NEW screen/log evidence to confirm mount/launchd; do not claim iOS booted
+from fastboot acceptance. No reflash needed or performed. WSL remains off.
+
 NEW PHOTO 20261020_175800.jpg: BSD root ufsroot0 major1/minor0, HFS recognises
 journal offset0x72000,size0x800000, but do_jnl_io strategy returns0x1e (EROFS30),
 write_journal_header fails, HFS mount22 and generic cannotmountroot19; retries.
