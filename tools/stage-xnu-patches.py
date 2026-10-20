@@ -18,7 +18,7 @@ def main():
     if not args.destination.is_dir():
         parser.error('destination must be the existing upstream patches directory')
     for path in selected:
-        text = path.read_text(encoding='utf-8')
+        text = path.read_text(encoding='utf-8', errors='surrogateescape')
         if args.board.startswith('cepheus'):
             if path.name.startswith('0010-'):
                 # Candidate ABL stride, still awaiting physical measurement.
@@ -34,7 +34,8 @@ def main():
                 if text.count(old) != 1:
                     raise ValueError('CPU label patch context changed')
                 text = text.replace(old, 'withCStringNoCopy("Kryo 485")')
-        (args.destination / path.name).write_text(text, encoding='utf-8', newline='\n')
+        (args.destination / path.name).write_text(text, encoding='utf-8',
+                                                errors='surrogateescape', newline='\n')
     print(f'{args.board}: staged {len(selected)} patch/helper files')
     if args.board == 'cepheus-ios':
         # Authorised target is the EXISTING userdata on this Mi 9, alongside
