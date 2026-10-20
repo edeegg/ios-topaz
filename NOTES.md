@@ -4,6 +4,20 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+USERDATA FLASH SUCCESS: session94761 EXIT0, all47 sparse Sending+Writing OKAY,
+Finished574.753s. Log research/cepheus/ios-sparse-flash.log ends
+FASTBOOT_EXIT_CODE=0. iOS filesystem IS NOW WRITTEN to existing userdata.
+Android data there was intentionally replaced per explicit authorisation.
+No other partition flash or erase commands. iOS userland boot NOT yet verified.
+
+Currently session45821 is fastboot reboot recovery followed by wsl touch
+/root/cepheus-tools/stop-image-cache-guard. Output stuck at Rebooting into recovery
+(no final response yet). Check this session / physical USB mode before another
+USB command. After it exits, wait ADB root recovery, read sda33 first4096bytes
+and compare expected-ios-hfs-prefix.bin; primary/secondary GPT compare backups.
+Then boot cfb335... cepheus-xnu-ios-boot.img temporarily to test installed root.
+Stop cache guard45733, optionally shut down WSL after UNC files no longer needed.
+
 FLASH NOW ACTIVE: session94761 runs flash-sparse-userdata.py. Verifier68200
 EXIT0 PASS:27691chunks,15032385536expandedbytes,SHA256bb8f0ace...; .simg.verified
 exists. Wrapper rechecked cepheus/unlocked/exactuserdata size. Native fastboot
