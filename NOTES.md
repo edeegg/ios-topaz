@@ -5,6 +5,17 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+User returned recovery; read productcepheus and hash136a7044... confirmed.
+Read-only persistent log saved research/cepheus/ios-190910-panic.bin/.txt,
+4198400bytes SWEETLOG total111247 flush49. Confirms AppleCLCD1080x2340,
+stride4320 at0x9c000000 registered and backboardd framebuffer calls succeed;
+previous missing display fixed. Panic tail not flushed before halt.
+Reboot bootloader, productcepheus/unlockedyes checked; temporary boot136a7044
+WITHOUT sweetfb_noconsole accepted SendingOKAY0.398s BootingOKAY0.151s,
+total0.561s. Await NEW physical screen, GUI not yet verified. No flash/WSL.
+
+
+
 NEW PHOTO 20261020_190910: display enabled now reaches backboardd surface
 creation1080x2340, then kernel panic "Unexpected fault in kernel static region".
 Exact PC fffffe0007456618 = switch_to_serial_console+0x1c (llvm-nm/objdump on
