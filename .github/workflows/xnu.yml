@@ -25,6 +25,7 @@ on:
     paths:
       - "xnu/patches/**"
       - ".github/workflows/xnu.yml"
+      - "tools/stage-xnu-patches.py"
 
 
 concurrency:
