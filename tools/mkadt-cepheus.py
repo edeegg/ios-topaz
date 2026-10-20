@@ -38,11 +38,15 @@ def main():
     parser.add_argument('--boot-mpidr', required=True, type=lambda s: int(s, 0),
                         help='must be confirmed with the CPU probe before boot')
     parser.add_argument('--out', required=True, type=Path)
+    parser.add_argument('--logical-display', action='store_true',
+                        help='use the iPhone X canvas; requires the logical-display kernel patch')
     parser.add_argument('--display', action='store_true',
                         help='publish the CPU-copy framebuffer at the verified ABL geometry')
     parser.add_argument('--storage-read-only', action='store_true',
                         help='include verified Mi 9 UFS map for the read-only kernel target')
     args = parser.parse_args()
+    if args.logical_display and not args.display:
+        parser.error('--logical-display requires --display')
     blob = args.live_dtb.read_bytes()
     nodes = fdt.parse_fdt(blob)
     if not any('cepheus' in text.lower() for key in ('model', 'compatible')
@@ -113,8 +117,8 @@ def main():
                               if c.name != 'wlan' and (args.display or c.name != 'disp0')]
             for device in child.children:
                 if device.name == 'disp0':
-                    setprop(device, 'canvas-width', mkadt.u32(mkadt.FB_W))
-                    setprop(device, 'canvas-height', mkadt.u32(mkadt.FB_H))
+                    setprop(device, 'canvas-width', mkadt.u32(1125 if args.logical_display else mkadt.FB_W))
+                    setprop(device, 'canvas-height', mkadt.u32(2436 if args.logical_display else mkadt.FB_H))
     if not args.storage_read_only:
         root.children = [c for c in root.children if c.name != 'sweet-ufs']
     args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -122,7 +126,8 @@ def main():
     args.out.write_bytes(result)
     print(f'{args.out}: {len(result)} bytes; RAM {bank[0]:#x}+{bank[1]:#x}, MPIDR {args.boot_mpidr:#x}')
     print('Candidate ADT: ' + ('read-only UFS target; ' if args.storage_read_only else 'no UFS; ') +
-          'no WLAN; ' + ('1080x2340 CPU-copy display. ' if args.display else 'no display service. ') +
+          'no WLAN; ' + ('1125x2436 logical CPU-copy display. ' if args.logical_display else
+                         '1080x2340 CPU-copy display. ' if args.display else 'no display service. ') +
           'Requires the matching Mi 9 kernel.')
 
 

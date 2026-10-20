@@ -5,6 +5,22 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+USER CONFIRMS LOCK SCREEN on136a image! GUI boot verified by user report.
+Remaining: console overwrites lockscreen, red status bar/native geometry,
+no physical touch/buttons, GPU/Metal, WiFi/BT/cellular/camera/fastcharge unported.
+User requests fixing all and analysing existing Mi9 Android/WOA references.
+Preparing CI: cepheus-ios explicitly adds ONLY framebuffer portion of0061
+as0061-cepheus-logical-display.patch (no SweetHID hardcoded2400 coordinates),
+plus existing0067-sweet-console-mute.patch. Original0060 hardware excluded.
+Topaz excludes cepheus duplicate0061. Both patches apply cleanly to actual CI59
+sources (research/cepheus/display-patch-check); consolemute retains persistent
+logging and panic display, no const cons_ops_index write. ADT --logical-display
+requires --display, 1125x2436 canvas, physical buffer1080x2340 unchanged.
+Next new kernel requires REMOVE sweetfb_native=1 and ADD sweetfb_noconsole=1.
+Phone in recovery now; don't boot oldkernel with noconsole flag. WSL remainsoff.
+
+
+
 User returned recovery; read productcepheus and hash136a7044... confirmed.
 Read-only persistent log saved research/cepheus/ios-190910-panic.bin/.txt,
 4198400bytes SWEETLOG total111247 flush49. Confirms AppleCLCD1080x2340,
