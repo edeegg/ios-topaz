@@ -7,6 +7,40 @@ sweet/topaz erase approvals do not apply. Preserve Android and Mindows (live
 by-name listing includes mindowsesp/mindowswin), GPT, firmware and backups.
 Detailed findings and reproduction: `CEPHEUS.md`.
 
+### Latest: Apple firmware staged; boot debugging continues (2026-10-20)
+
+User requested downloading iOS into this folder, installing by project guide,
+then booting it. Download COMPLETE: iPhone X 16.7.16 20H392 from Apple CDN,
+6,171,035,648 bytes, SHA256 ece1194f7e233e9109c5790a8d23a4564a10a254e15ec5b09978a343265568fb.
+Ignored research/ipsw-x contains IPSW, metadata, BuildManifest, the three DMGs
+(OS 087-86698-044, SystemOS 087-86593-047, AppOS 087-86715-047; ZIP CRC passed),
+and decoded d22ap.adt (186084 bytes). Candidate console ADT with product is
+6628 bytes. NO HFS root image built; no Linux distro/WSL2 kernel available.
+
+Preserved current GPT primary/secondary bytes read-only under research/cepheus.
+userdata=/dev/block/sda33, 61223206912 bytes; Mindows sda31/sda32 intact.
+Fastboot confirmed cepheus/unlocked=yes/secure=yes after associating installed
+Xiaomi oem141.inf with elevated pnputil. Temporary display probe Booting OKAY,
+but user reports ONLY BLACK SCREEN: execution unconfirmed. Entry/reset probe
+added (no framebuffer access, timed PSCI reset). Discovered stock kernel has
+Qualcomm UNCOMPRESSED_IMG + u32 size wrapper (20 bytes); builder now matches it.
+Corrected display SHA256 0fa65d6d044259bb91d0be78ba78ee4211cb02f0c6c4f0d96bdd2fcb53a1d413;
+corrected entry SHA256 39dee2fbdfe06194784ff3643a5809f0ff695f06f75fa10ff0573c1d4d0f3f3f.
+Wrapped entry image Booting OKAY; no fastboot return within 30s. ADB interface
+then appeared captured by forced USB/IP share. Unbound phone bus 1-4 only,
+with elevated usbipd; root recovery ADB restored. Current state=root recovery.
+Asked user whether latest return to recovery was manual or automatic; pending.
+Do not infer CPU entry from Booting OKAY. Corrected display probe NOT tested yet.
+
+Recovery DRM pitch=4352 AR24, whereas probe assumes 4320. Bootloader pitch is
+unknown. Recovery dmesg confirms splash reservation 0x9c000000+0x2400000.
+No flash/erase/unlock/GPT mutation/storage mount performed. Mounted debugfs
+only for display inspection. Follow AGENTS.md: concrete destructive installation
+requires separate confirmation when a validated Mi 9 kernel and root exist;
+do not erase userdata merely because firmware download is complete.
+NEXT: resolve CPU-entry/display boot, port XNU for cepheus, prepare Linux HFS+
+root-image environment. See CEPHEUS.md for exact artifact sizes and paths.
+
 ### Latest milestone: successful stage-0 compilation (2026-10-20)
 
 User changed session permissions to full access after explicitly requesting

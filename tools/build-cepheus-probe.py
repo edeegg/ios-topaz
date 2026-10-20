@@ -28,6 +28,8 @@ def align(value, page):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--stock-boot', type=Path, required=True)
+    parser.add_argument('--entry-test', action='store_true',
+                        help='avoid framebuffer; reboot to fastboot after 5 seconds')
     args = parser.parse_args()
     for tool in ('clang', 'ld.lld', 'llvm-objcopy'):
         if not shutil.which(tool):
@@ -55,14 +57,18 @@ def main():
         cursor += tree['size']
     if cursor != len(kernel):
         parser.error('unexpected data after appended DTBs')
-    out = root / 'shim/out/cepheus-probe'
+    variant = 'cepheus-entry-probe' if args.entry_test else 'cepheus-probe'
+    out = root / 'shim/out' / variant
     out.mkdir(parents=True, exist_ok=True)
     flags = ['--target=aarch64-none-elf', '-mcpu=cortex-a55', '-O2', '-ffreestanding',
              '-nostdlib', '-fno-pic', '-mgeneral-regs-only', '-mstrict-align',
              '-fno-stack-protector', '-Wall', '-Wextra', '-Werror',
              '-DFB_BASE=0x9c000000UL', '-DFB_H=2340', '-I', str(root / 'shim')]
+    if args.entry_test:
+        flags.append('-DCEPHEUS_ENTRY_TEST=1')
     objects = []
-    for name in ('start.S', 'console.c', 'cepheus-probe.c'):
+    sources = ('start.S', 'cepheus-probe.c') if args.entry_test else ('start.S', 'console.c', 'cepheus-probe.c')
+    for name in sources:
         obj = out / (Path(name).stem + '.o')
         run('clang', *flags, '-c', root / 'shim' / name, '-o', obj)
         objects.append(obj)
@@ -76,6 +82,14 @@ def main():
         parser.error('invalid linked ARM64 image_size')
     payload.extend(bytes(image_size - len(payload)))
     image.write_bytes(payload)
+    # Mi 9 ABL's stock layout wraps the raw ARM64 Image with a Qualcomm
+    # UNCOMPRESSED_IMG marker and its file length, then appends the DTBs.
+    # Match this verified layout instead of assuming topaz accepts raw Image.
+    wrapped = kernel.startswith(b'UNCOMPRESSED_IMG')
+    if wrapped:
+        if len(kernel) < 20 or struct.unpack_from('<I', kernel, 16)[0] + 20 != trees[0]['offset']:
+            parser.error('unexpected Qualcomm uncompressed kernel wrapper length')
+        payload = bytearray(b'UNCOMPRESSED_IMG' + struct.pack('<I', len(payload))) + payload
     payload += kernel[trees[0]['offset']:]
     # Fresh header: retain placement addresses/OS version, omit stock cmdline,
     # ramdisk, second stage and any footer/signature from the backup.
@@ -90,11 +104,11 @@ def main():
     digest.update(struct.pack('<I', 0))  # empty ramdisk
     digest.update(struct.pack('<I', 0))  # empty second stage
     header[576:596] = digest.digest()
-    boot = out / 'cepheus-probe-boot.img'
+    boot = out / f'{variant}-boot.img'
     boot.write_bytes(header + payload + bytes(align(len(payload), page) - len(payload)))
     sha = hashlib.sha256(boot.read_bytes()).hexdigest()
     (out / 'SHA256SUMS').write_text(f'{sha}  {boot.name}\n', encoding='ascii')
-    print(f'{boot}\n{boot.stat().st_size} bytes; {len(trees)} original DTBs; SHA256 {sha}')
+    print(f'{boot}\n{boot.stat().st_size} bytes; {len(trees)} original DTBs; Qualcomm wrapper={wrapped}; SHA256 {sha}')
     print('Built only. Hardware boot NOT tested. This image does not run XNU.')
 
 

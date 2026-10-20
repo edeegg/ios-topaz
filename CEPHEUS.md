@@ -1,5 +1,61 @@
 # Xiaomi Mi 9 (cepheus): initial bring-up
 
+## Latest session: firmware staged, hardware boot unconfirmed
+
+The requested iPhone X iOS 16.7.16 (20H392) IPSW was downloaded from Apple's CDN
+to ignored `research/ipsw-x/iPhone10,3,iPhone10,6_16.7.16_20H392_Restore.ipsw`.
+Size: 6,171,035,648 bytes; SHA256 independently checked:
+`ece1194f7e233e9109c5790a8d23a4564a10a254e15ec5b09978a343265568fb`.
+The D22AP Erase identity in BuildManifest selects:
+
+| Component | Extracted file | Bytes |
+| --- | --- | --- |
+| OS | 087-86698-044.dmg | 4730814044 |
+| Cryptex1,SystemOS | 087-86593-047.dmg | 2743074816 |
+| Cryptex1,AppOS | 087-86715-047.dmg | 10485760 |
+
+All three were extracted with ZIP CRC validation. DeviceTree.d22ap.im4p was
+decoded using a locally installed LZFSE wheel under ignored research/pydeps;
+`research/ipsw-x/d22ap.adt` is 186084 bytes. Candidate console ADT now includes
+the product node and is 6628 bytes. No HFS+ root image was built or installed.
+The current WSL installation has no distro and reports a missing WSL2 kernel;
+the guide's Linux apfs-fuse/HFS+ build environment is not available yet.
+
+The first temporary raw-image diagnostic was accepted by fastboot but the user
+observed only a black screen. An entry/reset-only variant was added, omitting
+all console code; it waits five seconds, sets restart_reason at 0x146bf65c
+(verified live FDT: IMEM 0x146bf000 + 0x65c), and calls PSCI SYSTEM_RESET.
+An exception parks instead, to avoid falsely reporting successful execution.
+The bootloader did not visibly return within 30 seconds of the wrapped test;
+CPU execution/reset remains unconfirmed. User was asked whether recovery was
+entered manually or automatically. Do not equate a Booting OKAY with execution.
+
+**Format correction:** the stock boot kernel has a 20-byte Qualcomm wrapper,
+`UNCOMPRESSED_IMG` plus little-endian u32 raw Image file length, before the Image.
+Its length exactly locates the first appended DTB. The builder now reproduces
+that wrapper. Current artifacts supersede the older hashes elsewhere below:
+
+- display probe: 2084864 bytes, SHA256
+  `0fa65d6d044259bb91d0be78ba78ee4211cb02f0c6c4f0d96bdd2fcb53a1d413`;
+- entry/reset probe: 2080768 bytes, SHA256
+  `39dee2fbdfe06194784ff3643a5809f0ff695f06f75fa10ff0573c1d4d0f3f3f`.
+
+Both pass independent wrapper/ARM64-header/length/SHA-1/byte-identical-DTB
+checks. The four DTB tests still pass. The corrected display probe has NOT
+been booted yet. Recovery DRM uses AR24 at pitch 4352, unlike the candidate
+probe's 4320; bootloader pitch is still unknown. Recovery dmesg confirms splash
+reservation 0x9c000000 + 0x2400000, but this does not identify active ABL scanout.
+
+Fastboot explicitly confirmed product=cepheus, unlocked=yes, secure=yes.
+The Windows Xiaomi driver oem141.inf needed association via elevated pnputil.
+A forced USB/IP share later captured the phone's ADB interface; the phone's
+bus 1-4 was unbound with usbipd (other devices were untouched). ADB then returned
+in recovery with uid=0. The phone was left there. Current GPT primary/secondary
+metadata were saved read-only under research/cepheus. userdata is sda33,
+61,223,206,912 bytes; Mindows is sda31/sda32 and remains intact. No flash, erase,
+unlock, GPT mutation or installation was performed. Debugfs was mounted for
+read-only display inspection; no disk filesystem was mounted by these steps.
+
 Status: offline/live DTB inspection works; a separate stage-0 CPU probe and a
 candidate single-CPU console ADT generator are written.
 **XNU and iOS have not booted on this device. The stage-0 boot image is compiled
