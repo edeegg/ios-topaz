@@ -4,6 +4,19 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+NEW PHOTO 20261020_175800.jpg: BSD root ufsroot0 major1/minor0, HFS recognises
+journal offset0x72000,size0x800000, but do_jnl_io strategy returns0x1e (EROFS30),
+write_journal_header fails, HFS mount22 and generic cannotmountroot19; retries.
+This confirms UFS reads and installed HFS access, but NOT successful root mount.
+It is consistent with the earlier forced-read-only kernel; last agent-issued
+successful boot was 8beccc... cepheus-xnu-ufs-ro before installation, and guarded
+writable cfb335... image has never been successfully booted by the agent.
+Rechecked prepared payload: ufsrw=1,rd=ufsroot0,ufsroot=userdata; cfb335...boot
+hash correct. CI source confirms writable=(rw!=0) plus exact userdata guard.
+Do NOT reinstall root. Next action is boot correct existing cepheus-xnu-ios
+image once phone returns responsive fastboot. Currently adb+fastboot empty;
+asked user Power+VolDown to fastboot, awaiting physical state. WSL remains off.
+
 POST-FLASH STATE: native fastboot reboot recovery stalled at Rebooting into
 recovery without response; cancelled that REBOOT client only after flash had
 already succeeded. Subsequent getvarproduct failed Write to device failed(no link).
