@@ -63,7 +63,7 @@ def makefile_sources(bt):
             for f in m.group(1).split():
                 f = f.replace('$(SOURCE_DIR)', CI_DXB + '/xnu')
                 if f.startswith('./'):	# generated (iig, yacc) in the build dir
-                    f = os.path.join(root.replace(bt, CI_DXB), f[2:])
+                    f = os.path.join(root.replace(bt, CI_DXB), f[2:]).replace('\\', '/')
                 out.append(f)
     return out
 
@@ -84,7 +84,7 @@ def component_dirs(bt):
     for root, _, files in os.walk(os.path.join(bt, 'build/xnu.obj')):
         if 'meta_features.h' in files:
             for c in COMPONENTS:
-                if f'/{c}/' in root + '/' and c not in out:
+                if f'/{c}/' in root.replace('\\', '/') + '/' and c not in out:
                     out[c] = root
     return out
 
@@ -113,7 +113,7 @@ def run(item, bt, cdirs):
         if a in DROP_WITH_ARG:
             skip = True
             continue
-        a = CI_SDK_PLATFORM.sub(os.path.join(bt, 'sdk-kernel-platform/platform'), a)
+        a = CI_SDK_PLATFORM.sub(lambda _: os.path.join(bt, 'sdk-kernel-platform/platform'), a)
         new.append(a.replace(CI_DXB, bt))
     new += os.environ.get('XNU_CC_POST', '').split()
     comp = next((c for c in COMPONENTS if f'/xnu/{c}/' in src), None) or \

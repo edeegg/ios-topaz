@@ -4,6 +4,33 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+FINAL MILESTONE THIS TURN: CI39454541376 SUCCESS. Real kernel artifact downloaded
+to research/cepheus/ci-kernel/kernel.development.sweet, 16416640 bytes,
+SHA256 88e3e2beed5d25677d38ec839e44922fc8a2beefed7e26f2d42c737fa24b4081.
+Mach-O plain arm64 subtype0 verified. Buildtree extracted natively under
+research/cepheus/local-buildtree; log ci-job-live-utf8.log. Local native Clang22
+compiled arm_init.c and sweet_early.c into REAL Mach-O objects. SweetCPU.cpp
+and many other components FAIL because Apple __builtin_xnu_type_summary and
+related type builtins are absent. Full local attempt covered hundreds of source
+files, producing >217 real objects under local-xnu-objects; stopped once the
+shared unsupported compiler feature was established. Log local-xnu-build.log.
+This is NOT a locally linked complete kernel. No fake builtin substitutions used.
+At most two compilers ran, observed working sets roughly 34-59MB each. TMP/TEMP
+explicitly G research/cepheus for object compilation/download commands.
+
+Generated real XNU payload, 15818080 bytes, no chained fixups; shared loader
+plus 4 original DTBs and Qualcomm wrapper produce
+shim/out/cepheus-xnu/cepheus-xnu-boot.img, 17907712 bytes,
+SHA256 60dd4e4f090a8a0c425ae862e599e0dbf4a6677603b54fe69e9ad20efcd149ab.
+Independent bootv0/header/ARM64-size/wrapper/SHA1 checks PASS. This image contains
+the REMOTELY compiled kernel, not the partial local objects.
+Rebooted recovery to fastboot; product cepheus/unlockedyes confirmed. Temporarily
+booted this image: Sending17488KB OKAY0.379s, BootingOKAY0.149s, total0.540s.
+ADB and fastboot now absent; user screen report requested asynchronously and
+PENDING. Do NOT claim XNU executed from fastboot OKAY. NO partition writes.
+NEXT: user's physical screen observation; if black, return recovery manually,
+diagnose ABL entry/framebuffer before attempting storage or iOS userland.
+
 User then insisted "compile aqui o! XNU". Prioritize LOCAL real Mach-O objects
 using the current CI's generated headers/buildtree when available. Adapted
 tools/xnu-cc.py: XNU_CC/XNU_CXX, XNU_CI_DXB configurable, XNU_CC_JOBS default2,
