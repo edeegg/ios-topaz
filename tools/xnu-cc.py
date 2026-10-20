@@ -17,12 +17,12 @@ Env: XNU_CC_EXTRA   extra flags (e.g. "-DKPERF -DKPC" for config changes)
      XNU_CC_OBJDIR  emit real objects there instead of a syntax-only check
                     (then: llvm-nm for undefined symbols = link errors)
 """
-import concurrent.futures as cf, os, re, shlex, subprocess, sys
+import concurrent.futures as cf, os, re, shlex, shutil, subprocess, sys
 from collections import Counter
 
-CI_DXB = '/Users/runner/work/ios-sweet/ios-sweet/dxb'
+CI_DXB = os.environ.get('XNU_CI_DXB', '/Users/runner/work/ios-sweet/ios-sweet/dxb')
 CI_SDK_PLATFORM = re.compile(r'/Applications/Xcode[^ ]*?\.sdk/+System/Library/Frameworks/Kernel\.framework/Versions/A/PrivateHeaders/platform')
-CLANG = os.path.expanduser('~/swift/usr/bin/clang')
+CLANG = os.environ.get('XNU_CC', os.path.expanduser('~/swift/usr/bin/clang'))
 DROP = {'-c', '-g', '-MD', '-MMD'}
 DROP_WITH_ARG = {'-MF', '-MT', '-o', '-arch'}
 COMPONENTS = ('osfmk', 'bsd', 'iokit', 'libkern', 'pexpert', 'security', 'san', 'libsa')
@@ -93,10 +93,16 @@ def run(item, bt, cdirs):
     src, (kind, args) = item
     objdir = os.environ.get('XNU_CC_OBJDIR')
     mode = ['-c', '-o', os.path.join(objdir, src.replace(CI_DXB + '/xnu/', '').replace('/', '__') + '.o')] if objdir else ['-fsyntax-only']
-    new = [CLANG if kind == 'clang' else CLANG + '++', '-target', 'arm64-apple-macos14.0', *mode,
+    compiler = CLANG if kind == 'clang' else os.environ.get('XNU_CXX', CLANG + '++')
+    new = [compiler, '-target', 'arm64-apple-macos14.0', *mode]
+    # These stand-ins are useful for syntax checks only. Real object builds
+    # must use the compiler's actual builtins or report unsupported features.
+    if not objdir:
+        new += [
            # Apple clang-only builtins (kalloc_type); values only matter for codegen
            '-D__builtin_xnu_type_signature(...)=""', '-D__builtin_xnu_type_summary(...)=0',
-           '-D__builtin_xnu_types_compatible(...)=1'] + os.environ.get('XNU_CC_EXTRA', '').split()
+           '-D__builtin_xnu_types_compatible(...)=1']
+    new += shlex.split(os.environ.get('XNU_CC_EXTRA', ''))
     skip = False
     for a in args:
         if skip:
@@ -121,6 +127,11 @@ def run(item, bt, cdirs):
 
 def main():
     log, bt = sys.argv[1], os.path.abspath(sys.argv[2])
+    if not os.path.isfile(CLANG) and not shutil.which(CLANG):
+        print('compiler unavailable: set XNU_CC (and XNU_CXX for C++)', file=sys.stderr)
+        return 1
+    if os.environ.get('XNU_CC_OBJDIR'):
+        os.makedirs(os.environ['XNU_CC_OBJDIR'], exist_ok=True)
     per_file = '--per-file' in sys.argv
     filters = [a for a in sys.argv[3:] if a != '--per-file']
     cmds = commands(log)
@@ -150,7 +161,7 @@ def main():
     cdirs = component_dirs(bt)
     print(f'{len(cmds)} files, build dirs: {sorted(cdirs)}', file=sys.stderr)
     errors, failed = Counter(), []
-    with cf.ThreadPoolExecutor(os.cpu_count()) as ex:
+    with cf.ThreadPoolExecutor(max(1, int(os.environ.get('XNU_CC_JOBS', '2')))) as ex:
         for src, rc, err in ex.map(lambda i: run(i, bt, cdirs), cmds.items()):
             if rc:
                 failed.append(src.replace(CI_DXB + '/xnu/', ''))

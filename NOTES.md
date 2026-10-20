@@ -4,6 +4,19 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+User then insisted "compile aqui o! XNU". Prioritize LOCAL real Mach-O objects
+using the current CI's generated headers/buildtree when available. Adapted
+tools/xnu-cc.py: XNU_CC/XNU_CXX, XNU_CI_DXB configurable, XNU_CC_JOBS default2,
+auto-create object directory. IMPORTANT: real object mode no longer defines fake
+Apple kalloc type builtins; unsupported compiler features must be reported rather
+than silently changing kernel behavior. Native clang22.1.4 and ld64.lld exist.
+No local full XNU kernel claimed: complete Apple build/link/toolchain dependencies
+are not established. Remote build remains useful for generated headers and baseline.
+CI_DXB for this run is /Users/runner/work/ios-topaz/ios-topaz/dxb. Logs written
+via PowerShell redirection are UTF16; decode to UTF8 before xnu-cc.py. CI job
+logs ARE available live via gh api repos/edeegg/ios-topaz/actions/jobs/118737811130/logs.
+Watch session94534 writes research/cepheus/ci-watch.log; CI artifact not yet ready.
+
 CI started: https://github.com/edeegg/ios-topaz/actions/runs/39454541376
 (commits 5947680 / 4bcaaa6). Build currently running. Initial workflow_dispatch
 returned 404 because the fork had not registered the workflow on its default
