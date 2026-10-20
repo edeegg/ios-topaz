@@ -5,6 +5,18 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+TOUCH IMAGE NOW TEMPORARILY BOOTED: user returned recovery, adb productcepheus
+and stable touchimage SHA256212d4098... verified. Saved prior console log via
+read-only last1025userdata blocks to research/cepheus/ios-before-touch-test.bin/
+.txt (SWEETLOG total222203 flush246). Rebootbootloader, productcepheus/unlockedyes
+confirmed. fastboot boot shim/out/cepheus-touch-test-boot.img SendingOKAY0.403s,
+BootingOKAY0.134s,total0.550s. NO FLASH. Physical screen/touch result PENDING.
+Wait45seconds before swipe; prototype starts30s after init. Do not claim touch
+working from fastboot success. On failure recovery pull NEXT persistent log and
+inspect CEPHEUS TOUCH clock/fw/chip/errors. WSL remainsoff.
+
+
+
 TOUCH FULL KERNEL CI39515787870 SUCCESS (commit31c11e4). Artifact onG:
 research/cepheus/ci-touch-kernel/kernel.development.sweet SHA256
 1bde46c56b989c4fe42f1f93c4c10a78e9c63aaa4dd96712ed4999e1500fffc8,
