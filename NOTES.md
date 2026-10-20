@@ -4,6 +4,20 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+POST-FLASH STATE: native fastboot reboot recovery stalled at Rebooting into
+recovery without response; cancelled that REBOOT client only after flash had
+already succeeded. Subsequent getvarproduct failed Write to device failed(no link).
+Phone still enumerates Android Bootloader Interface but adb empty. Requested
+user hold Power+VolDown10-15s to restore responsive FASTBOOT (or return recovery).
+This physical action is pending. Do NOT flash again: filesystem is installed.
+No post-flash header/GPT readback yet, and new iOS kernel has not been booted.
+Once responsive fastboot returns, check product/unlocked and temporary boot
+shim/out/cepheus-xnu-ios/cepheus-xnu-ios-boot.img (cfb335...); user wants boot test.
+If recovery returns instead, read HFSX first4096+GPT backups first, then boot.
+Cache guard45733 STOPPED cleanly via marker; WSL shutdown completed, host RAM
+free~6.5GB. Do not restart large image prep or conversion; both are complete.
+Images remain safely in G WSL VHD; boot image is native Windows G path.
+
 USERDATA FLASH SUCCESS: session94761 EXIT0, all47 sparse Sending+Writing OKAY,
 Finished574.753s. Log research/cepheus/ios-sparse-flash.log ends
 FASTBOOT_EXIT_CODE=0. iOS filesystem IS NOW WRITTEN to existing userdata.
