@@ -4,6 +4,18 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+FLASH NOW ACTIVE: session94761 runs flash-sparse-userdata.py. Verifier68200
+EXIT0 PASS:27691chunks,15032385536expandedbytes,SHA256bb8f0ace...; .simg.verified
+exists. Wrapper rechecked cepheus/unlocked/exactuserdata size. Native fastboot
+resident~9MB (sparse import avoids earlier raw-image32bit allocation failure).
+Current flash output only standard AVB-footer-skip warning so far; wait for
+all Sending/Writing OKAY and FASTBOOT_EXIT_CODE=0. DO NOT run another USB command
+or restart/double-flash during session94761. Log ios-sparse-flash.log captures it.
+Expected fresh HFSX first4096bytes saved research/cepheus/expected-ios-hfs-prefix.bin
+for optional readback after success; original GPT backups remain intact.
+Cache guard45733 still active. Sourcefiles/image on G WSL VHD; WSL must stay up
+until UNC flashing closes. User installed-data authorisation already explicit.
+
 CONVERSION FINISHED SUCCESSFULLY: session81834 exit0. Sparse file is
 /root/cepheus-ios-root/ios16-cepheus-root-20H392.simg, size12145388148 bytes.
 CURRENT ACTIVE VERIFICATION: exec session68200, Linux PID94, running
