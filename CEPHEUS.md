@@ -41,8 +41,10 @@ that wrapper. Current artifacts supersede the older hashes elsewhere below:
   `39dee2fbdfe06194784ff3643a5809f0ff695f06f75fa10ff0573c1d4d0f3f3f`.
 
 Both pass independent wrapper/ARM64-header/length/SHA-1/byte-identical-DTB
-checks. The four DTB tests still pass. The corrected display probe has NOT
-been booted yet. Recovery DRM uses AR24 at pitch 4352, unlike the candidate
+checks. The four DTB tests still pass. The corrected display probe was then
+temporarily booted: Sending OKAY 0.055s, Booting OKAY 0.139s, total 0.198s.
+The user's screen report is pending; no CPU execution claim yet.
+Recovery DRM uses AR24 at pitch 4352, unlike the candidate
 probe's 4320; bootloader pitch is still unknown. Recovery dmesg confirms splash
 reservation 0x9c000000 + 0x2400000, but this does not identify active ABL scanout.
 
@@ -50,7 +52,8 @@ Fastboot explicitly confirmed product=cepheus, unlocked=yes, secure=yes.
 The Windows Xiaomi driver oem141.inf needed association via elevated pnputil.
 A forced USB/IP share later captured the phone's ADB interface; the phone's
 bus 1-4 was unbound with usbipd (other devices were untouched). ADB then returned
-in recovery with uid=0. The phone was left there. Current GPT primary/secondary
+in recovery with uid=0. The phone was subsequently booted into the corrected
+display diagnostic; current screen observation is pending. Current GPT primary/secondary
 metadata were saved read-only under research/cepheus. userdata is sda33,
 61,223,206,912 bytes; Mindows is sda31/sda32 and remains intact. No flash, erase,
 unlock, GPT mutation or installation was performed. Debugfs was mounted for

@@ -40,6 +40,11 @@ requires separate confirmation when a validated Mi 9 kernel and root exist;
 do not erase userdata merely because firmware download is complete.
 NEXT: resolve CPU-entry/display boot, port XNU for cepheus, prepare Linux HFS+
 root-image environment. See CEPHEUS.md for exact artifact sizes and paths.
+Implementation/firmware handoff committed as `bbd2229`. AFTER that commit,
+root recovery ADB was used to reboot to bootloader and temporarily boot the
+corrected WRAPPED display probe (0fa65d6d...). Sending OKAY 0.055s, Booting OKAY
+0.139s, total 0.198s. Last commanded state is NOW the display diagnostic, not
+recovery. Await the user's screen report; no CPU values observed yet. No flash.
 
 ### Latest milestone: successful stage-0 compilation (2026-10-20)
 
