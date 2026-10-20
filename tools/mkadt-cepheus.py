@@ -38,6 +38,8 @@ def main():
     parser.add_argument('--boot-mpidr', required=True, type=lambda s: int(s, 0),
                         help='must be confirmed with the CPU probe before boot')
     parser.add_argument('--out', required=True, type=Path)
+    parser.add_argument('--display', action='store_true',
+                        help='publish the CPU-copy framebuffer at the verified ABL geometry')
     parser.add_argument('--storage-read-only', action='store_true',
                         help='include verified Mi 9 UFS map for the read-only kernel target')
     args = parser.parse_args()
@@ -107,7 +109,12 @@ def main():
             # Retain kryo470 as the existing IOKit CPU match alias.
             setprop(child.children[0], 'compatible', b'qcom,kryo485\0qcom,kryo470\0ARM,v8\0')
         elif child.name == 'arm-io':
-            child.children = [c for c in child.children if c.name not in ('wlan', 'disp0')]
+            child.children = [c for c in child.children
+                              if c.name != 'wlan' and (args.display or c.name != 'disp0')]
+            for device in child.children:
+                if device.name == 'disp0':
+                    setprop(device, 'canvas-width', mkadt.u32(mkadt.FB_W))
+                    setprop(device, 'canvas-height', mkadt.u32(mkadt.FB_H))
     if not args.storage_read_only:
         root.children = [c for c in root.children if c.name != 'sweet-ufs']
     args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -115,7 +122,8 @@ def main():
     args.out.write_bytes(result)
     print(f'{args.out}: {len(result)} bytes; RAM {bank[0]:#x}+{bank[1]:#x}, MPIDR {args.boot_mpidr:#x}')
     print('Candidate ADT: ' + ('read-only UFS target; ' if args.storage_read_only else 'no UFS; ') +
-          'no WLAN/display service. Requires the matching Mi 9 kernel.')
+          'no WLAN; ' + ('1080x2340 CPU-copy display. ' if args.display else 'no display service. ') +
+          'Requires the matching Mi 9 kernel.')
 
 
 if __name__ == '__main__':

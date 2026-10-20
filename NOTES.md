@@ -4,6 +4,35 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+
+NEW PHOTO 20261020_190251 + PERSISTENT LOG: iOS userland BOOTS. Backboardd[56]
+alive, xpcproxy/AKS daemons running; SpringBoard repeatedly SIGTRAP and heap
+contains "failed to find the main CADisplay". Root/platform fixes work.
+Read-only recovery pull of last1025 userdata blocks at14946047 saved complete
+4198400bytes in research/cepheus/ios-190251-persistent.bin, decoded .txt;
+SWEETLOG v1 total217523 flush968, not wrapped. No AppleCLCD startup log.
+Cause found: mkadt-cepheus removed disp0, preventing sweet,display matching.
+Audited current CI59 SweetFramebuffer: only CPU-copy to existing ABL buffer,
+no Topaz display hardware MMIO. Added opt-in --display to publish disp0 with
+actual1080x2340 canvas, still removes WLAN, preserves oneCPU and UFS guards.
+Original console ADT behavior unchanged. Did NOT enable original0060 touch/
+GPIO or other Topaz hardware patches. Native geometry first diagnostic test;
+0061 logical iPhoneX display patch also modifies HID and must be split/audited
+before using (do not stage original0060 to get0061).
+Built shim/out/cepheus-ios-display.adt7104bytes, payload cepheus-xnu-ios-display.bin
+with canonical flags plus sweetfb_native=1 sweetfb_noconsole=1. Same CI kernel
+4c3dfab1...; output SAME cepheus-xnu-ios-boot.img path now SHA256
+ a2485b709af0910e9c0259e9b62b92a4b289189ee2bdde58cc546a855291888e.
+Validated serialized canvas, compatibility, single CPU, noWLAN and builder
+checks. User recovery productcepheus, adb reboot bootloader, getvar product
+cepheus/unlockedyes. Temporary fastboot boot SendingOKAY0.394s BootingOKAY
+0.146s total0.550s. No flash/reinstall, WSL stayed OFF. NEW SCREEN PENDING.
+Console only disabled upon first present, so no-frame logs stay visible.
+Next: user screen result; on failure retrieve NEXT persistent log and inspect
+SWEET FB/IOK framebuffer matching, SpringBoard reasons. Native geometry may
+need iPhoneX logical1125x2436 later; do not claim GUI until physical evidence.
+
+
 NEW PHOTO 20261020_180405.jpg: UFS userdata LUN0 first0xe06c00,58387MiB,
 READ-WRITE,DMA0x143d2c000; HFS journal initialised and "hfs: mounted iOSRoot".
 Root unsealed warning25 is expected; then exec /sbin/launchd is SIGKILL with
