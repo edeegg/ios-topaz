@@ -85,6 +85,8 @@ def main():
                 parser.error('Mi 9 UFS requires verified map and matching userdata boot arguments')
         elif ufs_nodes:
             parser.error('UFS ADT requires explicit --storage-read-only and the matching kernel')
+        if args.storage_userdata and [a for a in cmdline if a.startswith('unentitled_ios_sim_launch=')] != ['unentitled_ios_sim_launch=1']:
+            parser.error('macOS DEVELOPMENT XNU requires unentitled_ios_sim_launch=1 for iOS binaries')
     for tool in ('clang', 'ld.lld', 'llvm-objcopy'):
         if not shutil.which(tool):
             parser.error(f'{tool} not found on PATH')

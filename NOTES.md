@@ -4,6 +4,27 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+NEW PHOTO 20261020_180405.jpg: UFS userdata LUN0 first0xe06c00,58387MiB,
+READ-WRITE,DMA0x143d2c000; HFS journal initialised and "hfs: mounted iOSRoot".
+Root unsealed warning25 is expected; then exec /sbin/launchd is SIGKILL with
+namespace9/code0xe. Exact reason.h decoding: OS_REASON_EXEC=9,
+EXEC_EXIT_REASON_WRONG_PLATFORM=14, NOT CPU illegal instruction or necessarily
+signature-page failure. kern_exec.c macOS target requires DEVELOPMENT bootarg
+unentitled_ios_sim_launch=1 for iOS binaries without spawn platform attributes.
+Initial commentary guessed code validation from CS_KILLED, corrected by code.
+
+Fixed boot configuration WITHOUT kernel rebuild or root reflash. Canonical
+tools/cepheus-ios-bootargs.txt now includes the project's already documented
+working iOS flags: unentitled_ios_sim_launch1,ignition_level1,rootrw1,
+launchd_unsecure_cache1,wdt_testno_user_checkin,wdt-1,-noprogress, plus existing
+cpus1/ufsrw1/ufsrootuserdata/rd=ufsroot0. Builder rejects guarded userdata builds
+missing/duplicating the iOS-platform bootarg. Kernel binary remains4c3dfab1...
+New bootimage at SAME cepheus-xnu-ios path,18640896bytes,SHA256
+94f529fc010509c62b5aa57dc9c550ced89713b8797484b75cced57bf42caf84.
+User returned root recovery; productcepheus confirmed, rebootbootloader,
+productcepheus/unlockedyes; new image temporarily booted SendingOKAY0.396s,
+BootingOKAY0.140s,total0.545s. Physical screen report PENDING. No reflash.
+
 FIRST GUARDED WRITABLE IOS KERNEL BOOT NOW SENT: user returned recovery. adb
 productcepheus; readback sda33 first4096bytes EXACTLY matches expected HFSX
 prefix; primary+secondary GPT EXACTLY match preserved backups. Installation
