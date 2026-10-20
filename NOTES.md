@@ -4,6 +4,40 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+LATEST HARDWARE/INSTALL STEERING: second user photo 20261020_123834.jpg confirms
+SHA1 panic resolved: boot CPU0 registered, SGI1 verified, CPU initialization
+complete, Darwin22.6.0 and Skywalk self-tests PASSED. User later reported last
+line Failed to write boot-picker-bringup-reason to NVRAM. Source confirms this
+is the BSD_BOOTFAIL_MEDIA_MISSING path in IOKitBSDInit.cpp (missing-boot-media),
+not evidence that NVRAM emulation alone fixes boot. Current console ADT omitted
+UFS, so a missing root is expected. Do not claim iOS installed.
+
+User explicitly requested "teste instalar o ios para saber se ele ira dar boot".
+Existing userdata erasure authorisation remains valid; do not reconfirm. Wait
+for COMPLETE VERIFIED root image before flashing existing userdata ONLY.
+Current root build session3831 remains RUNNING; log ios-root-build.log, actual
+OS copying, latest HFS used4.7GiB/14GiB. Never flash the partial image. Source
+caching completed and rsync runs locally inside G WSL VHD. Keep WSL running.
+
+Read-only storage test image compiled/generated at
+shim/out/cepheus-xnu-ufs-ro/cepheus-xnu-ufs-ro-boot.img,18448384bytes,
+SHA2568beccce2dfa921b83a64d8c503dd328629420dc11033e15dd0b08c21f0681521.
+Payload uses verified UFS ADT and rd=ufsroot0 ufsroot=userdata ufsrw=0.
+Initial temporary boot SendingOKAY0.398s/BootingOKAY0.154s,total0.563s.
+User requested repeat: recovery->bootloader productcepheus/unlockedyes, repeated
+SendingOKAY0.389s/BootingOKAY0.149s,total0.547s. Screen/UFS output PENDING.
+No partition writes. Phone now in this bare-metal test until manual recovery.
+
+Next iOS userland kernel target cepheus-ios stages0001-0059 (no GPIO/touch/modem)
+plus guard refusing ufsrw writes unless userdata,LUN0,firstblock14707712,
+nblocks14947072 (61223206912bytes). This preserves Mindows sda31/32. CI active
+run39459977489 on commitf376f80; prior39459872960 failed patch staging on
+nonUTF8 bytes in0058, fixed with surrogateescape. Watch workflow path now includes
+tools/stage-xnu-patches.py. Need verify generated write-guard patch applied to
+new buildtree before enabling writes. Boot builder currently permits ONLY
+storage-read-only/ufsrw0; extend explicit userdata-only option for new kernel.
+Do not use the old forced-read-only kernel as proof of read-write iOS boot.
+
 User requested repeating the SHA1-fixed boot. Reconfirmed recovery product
 cepheus, rebooted to bootloader, productcepheus/unlockedyes checked. Same
 b5addf68... image temporarily booted: Sending18016KB OKAY0.390s,
