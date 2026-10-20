@@ -3,9 +3,60 @@
 ## Active local handoff: Mi 9 / cepheus, 2026-10-20
 
 User requested porting ios-topaz to Xiaomi Mi 9. This is a NEW target; previous
-sweet/topaz erase approvals do not apply. Preserve Android and Mindows (live
+sweet/topaz erase approvals do not apply. See explicit new userdata authorization
+below. Preserve Mindows (live
 by-name listing includes mindowsesp/mindowswin), GPT, firmware and backups.
 Detailed findings and reproduction: `CEPHEUS.md`.
+
+### Current authorization / build-environment work (2026-10-20)
+
+UPDATE: Ubuntu 22.04.5 LTS successfully imported as `Ubuntu` (WSL2), verified
+BasePath \\?\G:\WSL\Ubuntu and root shell. Rootfs official SHA256 verified:
+1483cc5c1dce13064f774834cbffdff226559fd522a67a381a8ea77d63fb4109.
+`wsl --update --inbox` returned 0 but only checked update availability; import
+still complained missing kernel. Downloaded official Microsoft wsl_update_x64.msi,
+verified Authenticode Valid/Microsoft Corporation, installed elevated successfully
+(MSI return 0). Running kernel 5.10.16.3-microsoft-standard-WSL2.
+No host restart was needed. Linux tools/apfs-fuse setup COMPLETED (session
+81672, CEPHEUS_LINUX_TOOLS_READY). Build-essential/hfsprogs/rsync/Python are ready.
+HFS+ is disabled in stock kernel; CONFIG_MODVERSIONS=y, so a naive standalone
+module is unsuitable. Exact official WSL kernel source is cloned under
+/root/cepheus-wsl-kernel (tag linux-msft-wsl-5.10.16.3, commit a571dc8cedc8e0e56487c0dc93243e0b5db8960a).
+Building bzImage with HFSPLUS_FS builtin in exec session 39505, script
+research/windows-builder/build-wsl-hfs-kernel.sh, detailed build log
+research/windows-builder/hfs-kernel-build.log. No .wslconfig exists yet; if using
+custom kernel, store image in G:\WSL and configure that path, then restart
+ONLY WSL after tools/build finish. Current phone last seen root recovery.
+APFS sources mounted read-only by apfs-fuse at /root/cepheus-ios-sources/{os,sysos,appos}.
+launchd stat verifies 0755 root:root. `du` logical size scan is still running in
+exec session 1056 (mount-ios-sources.sh). Need sizes before choosing output size:
+G has ~16.5 GB free after kernel sources, so default 16 GiB image does NOT fit.
+Use a smaller image only if the total decompressed content plus headroom fits;
+otherwise obtain space. Root file should stay under ignored research/ipsw-x.
+Project shell scripts have CRLF; normalize a COPY into WSL before executing.
+
+After repeated explanation that installing into userdata erases Android data
+and that the Mi 9 kernel does not yet boot, user explicitly said:
+"mesmo assim instale! tenho um backup!". This authorizes writing the prepared
+iOS root into EXISTING userdata (/dev/block/sda33) despite unverified boot.
+Do not ask again for this same authorized step once an actual validated HFS+
+image exists. It does NOT authorize GPT changes, deleting Mindows, unlocking,
+or overwriting bootloaders/recovery/modem/persist. No image has been written yet.
+
+User first requested Windows-only preparation; portable QEMU and Alpine helper
+files were downloaded into ignored research/windows-builder. User then selected
+"WSL com Ubuntu no disco G"; active plan is Ubuntu in G:\WSL\Ubuntu.
+The initial elevated wsl --update --web-download failed with insufficient disk
+space on C. Minimal manual kernel MSI and direct rootfs import succeeded later
+as described above. C now has only ~570 MB free; avoid putting build data there.
+Historical logs: wsl-install.log, wsl-inbox-update.log, wsl-kernel-msi.log.
+Latest WSL CLI lacks --version and --location, so import is the correct older
+supported command. Do not reboot the host Windows without user approval.
+
+Attempted cleanup of our downloaded QEMU tree using verified absolute path was
+rejected by execution policy (blocked by policy). No cleanup was performed;
+do not bypass this rejection with a different deletion tool. QEMU files remain,
+roughly 1.3 GB; G has ~20 GB free before Ubuntu/root image allocation.
 
 ### Latest: Apple firmware staged; boot debugging continues (2026-10-20)
 
