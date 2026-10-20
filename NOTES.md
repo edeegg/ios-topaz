@@ -4,6 +4,29 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+INSTALLATION IN PROGRESS, DO NOT RESTART/DOUBLE FLASH: exec session30445 runs
+fastboot -S 256M flash userdata \\wsl$\Ubuntu\root\cepheus-ios-root\ios16-cepheus-root-20H392-cached.img.
+User explicitly authorised this earlier and asked again to test installation.
+Root image COMPLETE VERIFIED, unmounted; .verified marker exists, size15032385536,
+SHA256bb8f0acecfbb8e677d55c1f5114ef9e9c5399cc91edfd409a57fa91bab8fec08.
+Root metadata/launchd MachO/shared-cache hardlinks/keybag PASS, fsck clean.
+Full build log ends CEPHEUS_IOS_ROOT_VERIFIED. WSL remains running so UNC works.
+Before reboot, root recovery productcepheus, userdata61223206912 and BOTH GPT
+backups byte-identical to saved copies. Fastboot productcepheus/unlockedyes,
+partition-sizeuserdata0xE41300000 exactly61223206912, maxdownload805306368.
+Dropped WSL page cache after completed image build to lower memory pressure.
+No other partition target is authorised. Wait for real flash result, then boot.
+
+CI39459977489 SUCCESS, kernel research/cepheus/ci-ios-kernel/kernel.development.sweet
+SHA2564c3dfab1e559c32718a41f4c415a870945909c566a713c1868838f44db6015e2.
+Verified buildtree UFS source includes exact userdata LUN0/14707712/14947072 write
+guard and su.writable=(rw!=0). Builder extended --storage-userdata (exclusive
+with read-only), requires ufssrw1 + userdata + correct map. Generated
+shim/out/cepheus-xnu-ios/cepheus-xnu-ios-boot.img,18640896bytes,
+SHA256cfb335f39d06c1b23e65004caf1d475779bc19b5f05b0432fbb2d32a07b35e0b.
+Boot args rd=ufsroot0 ufsroot=userdata ufsrw=1. This image has NOT been booted yet.
+No claim of iOS userland execution. GUI/input/display port still incomplete.
+
 LATEST HARDWARE/INSTALL STEERING: second user photo 20261020_123834.jpg confirms
 SHA1 panic resolved: boot CPU0 registered, SGI1 verified, CPU initialization
 complete, Darwin22.6.0 and Skywalk self-tests PASSED. User later reported last
