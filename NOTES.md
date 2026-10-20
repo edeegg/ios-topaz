@@ -4,6 +4,28 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+LATEST ACTIVE SESSIONS (supersede old root-build notes below): CI39457341486
+building cepheus-ufs commit81a48d4; job118747538971. Phone is root RECOVERY,
+user confirmed and adb detects it. No new boot after the photographed panic.
+Image build session3831 runs research/windows-builder/build-ios-root.sh, log
+research/windows-builder/ios-root-build.log. FINAL candidate output is now
+/root/cepheus-ios-root/ios16-cepheus-root-20H392-cached.img inside G WSL VHD.
+Windows path \\wsl$\Ubuntu\root\cepheus-ios-root\ios16-cepheus-root-20H392-cached.img.
+No completed verified marker/hash yet. Do not flash partial images.
+
+Preparation performance fixes: direct /mnt/g image mkfs stuck in p9 RPC after
+37MB small writes; terminated Ubuntu (not Windows), removed ONLY that unverified
+generated NTFS image using checked literal path. No relation to prior blocked
+QEMU cleanup. First Linux-image rsync also suffered slow APFS reads from /mnt/g;
+stopped its rsync gracefully. Its old unverified /root/cepheus-ios-root/
+ios16-cepheus-root-20H392.img remains partial, do not use it.
+tools/mkiosroot.sh now stages/mounts/copies/releases ONE source at a time;
+optional IOS_LOCAL_DMG_CACHE=1 copies each DMG into its own Linux temp directory
+before APFS reads, then unmounts before deleting that temporary copy. Original
+Apple DMGs are unchanged. This limits peak cache space and avoids small-I/O p9.
+The current build uses this option and the new -cached.img destination.
+Data remains on G; WSL RAM6GB/swap0; do not shut down WSL while build is active.
+
 NEW HARDWARE EVIDENCE: user supplied phone photo showing a real XNU panic,
 not merely a shim/black screen. Readable saved PC is consistent with sha1_init
 0xfffffe0007910b28 (ldr x20,[x22,#0x28]), LR 0xfffffe00079791dc in

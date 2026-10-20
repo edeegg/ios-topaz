@@ -46,15 +46,24 @@ trap cleanup EXIT
 # Keep the .dmg name: apfs-fuse only parses UDIF images (the OS one is UDIF,
 # the cryptexes are raw APFS) when the file name ends in .dmg.
 apfs_mount() {
-	ln -s "$1" "$work/$2.dmg"
+	if [[ ${IOS_LOCAL_DMG_CACHE:-0} == 1 ]]; then
+		echo "staging $2 source onto Linux filesystem"
+		cp "$1" "$work/$2.dmg"
+	else
+		ln -s "$1" "$work/$2.dmg"
+	fi
 	mkdir "$work/$2"
 	# As root: a user's FUSE mount is unreadable to the root rsync below.
 	sudo "$(command -v apfs-fuse)" "$work/$2.dmg" "$work/$2"
 	mounts+=("$work/$2")
 }
-apfs_mount "$os" os
-apfs_mount "$sysos" sysos
-apfs_mount "$appos" appos
+
+# Release each cached source before staging the next: source + destination
+# must fit together, but all three large source copies need not coexist.
+release_source() {
+	sudo umount "$work/$1"
+	rm -f "$work/$1.dmg"
+}
 
 truncate -s "$size" "$out"
 mkfs.hfsplus -s -J -v iOSRoot "$out"
@@ -67,9 +76,15 @@ copy() {
 	sudo mkdir -p "$2"
 	sudo rsync -aH --numeric-ids "$1/" "$2/"
 }
+apfs_mount "$os" os
 copy "$work/os/root" "$work/root"
+release_source os
+apfs_mount "$sysos" sysos
 copy "$work/sysos/root" "$work/root/private/preboot/Cryptexes/OS"
+release_source sysos
+apfs_mount "$appos" appos
 copy "$work/appos/root" "$work/root/private/preboot/Cryptexes/App"
+release_source appos
 
 # Shared cache where dyld looks at ignition level 1: hard links, no extra space.
 dsc=private/preboot/Cryptexes/OS/System/Library/Caches/com.apple.dyld
