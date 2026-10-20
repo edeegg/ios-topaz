@@ -4,6 +4,19 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+IMPORTANT RAW FLASH FAILED: session30445 exited1 with uncaught std::bad_alloc,
+before any Sending/Writing/Erasing output. Do not claim installation success.
+Installed Windows fastboot36.0.2 is PE machine0x14c (32-bit), cannot handle this
+raw14GiB import in its address space even with -S256M. Phone remains bootloader.
+Installed Ubuntu android-sdk-libsparse-utils (official apt package,108KB), then
+started img2simg in exec session81834: original verified raw image ->
+/root/cepheus-ios-root/ios16-cepheus-root-20H392.simg. Conversion IN PROGRESS.
+After conversion, verify sparse expanded SHA256 equals rawbb8f0ace... and raw
+size15032385536 using tools/verify-android-sparse.py in WSL (streaming,1MB RAM).
+Then retry Windows fastboot -S256M flash userdata on the SPARSE .simg UNC path,
+not raw .img. Same authorisation/partition checks already established. Never
+restart an already running flash; check its exec session for completion first.
+
 INSTALLATION IN PROGRESS, DO NOT RESTART/DOUBLE FLASH: exec session30445 runs
 fastboot -S 256M flash userdata \\wsl$\Ubuntu\root\cepheus-ios-root\ios16-cepheus-root-20H392-cached.img.
 User explicitly authorised this earlier and asked again to test installation.
