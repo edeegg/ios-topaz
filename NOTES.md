@@ -2,6 +2,32 @@
 
 ## Active local handoff: Mi 9 / cepheus, 2026-10-20
 
+### Latest: actual XNU console build for cepheus (2026-10-20)
+
+User explicitly requested real kernel adaptation, compilation and temporary tests
+on the Mi 9, keeping large working files on G and avoiding host memory overload.
+`tools/stage-xnu-patches.py --board cepheus` stages ONLY patches 0001-0018:
+plain arm64, 16K, generic Qualcomm GIC Group1/timer, DT platform, single boot CPU.
+No UFS, input, USB, modem, battery/cpufreq or direct display drivers are included.
+The existing SWEET machine identifier remains a shared implementation detail.
+Mi 9 adaptations: early console height 2340, stage-zero tile row 2308, CPU name
+Kryo 485. Candidate stride 4320 remains UNVERIFIED for ABL (recovery uses 4352).
+Boot MPIDR and 16K support still require actual entry measurement; do not mistake
+a successful compile/fastboot OKAY for observed execution. This kernel is for
+console bring-up and cannot start the iOS filesystem. CI now selects board and
+isolates its ccache. Use owned fork edeegg/ios-topaz (ADMIN); origin is READ only.
+Four DTB parser tests pass; local staging produces 18 files. Phone currently
+absent from BOTH adb and fastboot, so physical tests cannot start yet.
+
+WSL HFS kernel build finished successfully; custom image at
+G:\WSL\kernels\cepheus-hfs-bzImage (10764352 bytes), loaded and hfsplus verified.
+HFS smoke test (owner/mode, hardlink/symlink, case sensitivity, fsck) PASSED.
+Ubuntu VHD is G:\WSL\Ubuntu\ext4.vhdx; .wslconfig limits RAM to 6GB, swap=0.
+No actual iOS root image built or installed. Root-image preparation is deferred
+while prioritizing the user's latest request for real XNU port/build/test.
+Windows still uses C for its own components/configuration; zero C writes is
+not promised. Use remote macOS CI for full XNU compilation.
+
 User requested porting ios-topaz to Xiaomi Mi 9. This is a NEW target; previous
 sweet/topaz erase approvals do not apply. See explicit new userdata authorization
 below. Preserve Mindows (live

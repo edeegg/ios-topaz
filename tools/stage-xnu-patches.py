@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+"""Stage the full Topaz series or the minimal Mi 9 console bring-up series."""
+import argparse
+from pathlib import Path
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--board', choices=('topaz', 'cepheus'), required=True)
+    parser.add_argument('--destination', type=Path, required=True)
+    args = parser.parse_args()
+    source = Path(__file__).resolve().parents[1] / 'xnu/patches'
+    selected = sorted(p for p in source.iterdir()
+                      if p.suffix in ('.patch', '.sh') and
+                      (args.board == 'topaz' or int(p.name[:4]) <= 18))
+    if not args.destination.is_dir():
+        parser.error('destination must be the existing upstream patches directory')
+    for path in selected:
+        text = path.read_text(encoding='utf-8')
+        if args.board == 'cepheus':
+            if path.name.startswith('0010-'):
+                # Candidate ABL stride, still awaiting physical measurement.
+                # Keep stage-zero marker inside the Mi 9's 2340-line surface.
+                for old, new in (('2368 * 4320', '2308 * 4320'),
+                                 ('#define EARLY_HEIGHT 2400u',
+                                  '#define EARLY_HEIGHT 2340u')):
+                    if text.count(old) != 1:
+                        raise ValueError(f'{path.name}: expected exactly one {old!r}')
+                    text = text.replace(old, new)
+            elif path.name.startswith('0018-'):
+                old = 'withCStringNoCopy("Kryo 470")'
+                if text.count(old) != 1:
+                    raise ValueError('CPU label patch context changed')
+                text = text.replace(old, 'withCStringNoCopy("Kryo 485")')
+        (args.destination / path.name).write_text(text, encoding='utf-8', newline='\n')
+    print(f'{args.board}: staged {len(selected)} patch/helper files')
+    if args.board == 'cepheus':
+        print('Single CPU console only; no UFS, touch, USB, modem or iOS root driver.')
+
+
+if __name__ == '__main__':
+    main()
