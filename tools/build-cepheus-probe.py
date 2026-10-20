@@ -10,6 +10,7 @@ import importlib.util
 from pathlib import Path
 import shutil
 import struct
+import adt
 import subprocess
 
 
@@ -30,7 +31,41 @@ def main():
     parser.add_argument('--stock-boot', type=Path, required=True)
     parser.add_argument('--entry-test', action='store_true',
                         help='avoid framebuffer; reboot to fastboot after 5 seconds')
+    parser.add_argument('--payload', type=Path,
+                        help='validated mkpayload.py XNU console payload (boot MPIDR 0)')
     args = parser.parse_args()
+    if args.payload and args.entry_test:
+        parser.error('--payload and --entry-test are mutually exclusive')
+    xnu_payload = None
+    if args.payload:
+        xnu_payload = args.payload.read_bytes()
+        if len(xnu_payload) < 0x2a8 or xnu_payload[:8] != b'SWEETXNU':
+            parser.error('invalid XNU payload header')
+        version, nsegs = struct.unpack_from('<II', xnu_payload, 8)
+        virt, entry, adt_off, adt_size, end, phys, mem = struct.unpack_from('<7Q', xnu_payload, 16)
+        if (version != 1 or not 1 <= nsegs <= 32 or
+                phys != 0x140000000 or mem != 0xc0000000 or
+                not virt <= entry < end or end - virt + adt_size + 0x8000 > mem or
+                adt_off < 0x2a8 + nsegs * 32 or adt_off % 8 or
+                adt_size < 4 or adt_off + adt_size > len(xnu_payload)):
+            parser.error('payload does not fit the verified cepheus high RAM bank')
+        for i in range(nsegs):
+            va, size, off, length = struct.unpack_from('<4Q', xnu_payload, 0x2a8 + i * 32)
+            if (va < virt or va + size > end or length > size or
+                    off % 8 or off < 0x2a8 + nsegs * 32 or
+                    off + align(length, 8) > len(xnu_payload) or size % 8):
+                parser.error(f'payload segment {i} is out of bounds or unaligned')
+        tree, consumed = adt.parse(xnu_payload[adt_off:adt_off + adt_size])
+        if consumed != adt_size:
+            parser.error('payload ADT length mismatch')
+        chosen = next(c for c in tree.children if c.name == 'chosen')
+        cpus = next(c for c in tree.children if c.name == 'cpus')
+        if (chosen.prop('dram-base') != struct.pack('<Q', phys) or
+                chosen.prop('dram-size') != struct.pack('<Q', mem) or
+                len(cpus.children) != 1 or cpus.children[0].prop('reg') != bytes(4) or
+                b'xiaomi,cepheus\0' not in tree.prop('compatible') or
+                any(c.name == 'sweet-ufs' for c in tree.children)):
+            parser.error('payload requires the cepheus single-CPU no-storage ADT')
     for tool in ('clang', 'ld.lld', 'llvm-objcopy'):
         if not shutil.which(tool):
             parser.error(f'{tool} not found on PATH')
@@ -57,7 +92,8 @@ def main():
         cursor += tree['size']
     if cursor != len(kernel):
         parser.error('unexpected data after appended DTBs')
-    variant = 'cepheus-entry-probe' if args.entry_test else 'cepheus-probe'
+    variant = ('cepheus-xnu' if xnu_payload else
+               'cepheus-entry-probe' if args.entry_test else 'cepheus-probe')
     out = root / 'shim/out' / variant
     out.mkdir(parents=True, exist_ok=True)
     flags = ['--target=aarch64-none-elf', '-mcpu=cortex-a55', '-O2', '-ffreestanding',
@@ -67,7 +103,9 @@ def main():
     if args.entry_test:
         flags.append('-DCEPHEUS_ENTRY_TEST=1')
     objects = []
-    sources = ('start.S', 'cepheus-probe.c') if args.entry_test else ('start.S', 'console.c', 'cepheus-probe.c')
+    sources = (('start.S', 'console.c', 'cepheus-xnu.c', 'loader.c', 'fdt.c') if xnu_payload else
+               ('start.S', 'cepheus-probe.c') if args.entry_test else
+               ('start.S', 'console.c', 'cepheus-probe.c'))
     for name in sources:
         obj = out / (Path(name).stem + '.o')
         run('clang', *flags, '-c', root / 'shim' / name, '-o', obj)
@@ -81,6 +119,10 @@ def main():
     if image_size < len(payload) or image_size > 16 * 1024 * 1024:
         parser.error('invalid linked ARM64 image_size')
     payload.extend(bytes(image_size - len(payload)))
+    if xnu_payload:
+        payload.extend(bytes(align(len(payload), 4096) - len(payload)))
+        payload.extend(xnu_payload)
+        struct.pack_into('<Q', payload, 16, len(payload))
     image.write_bytes(payload)
     # Mi 9 ABL's stock layout wraps the raw ARM64 Image with a Qualcomm
     # UNCOMPRESSED_IMG marker and its file length, then appends the DTBs.
@@ -109,7 +151,8 @@ def main():
     sha = hashlib.sha256(boot.read_bytes()).hexdigest()
     (out / 'SHA256SUMS').write_text(f'{sha}  {boot.name}\n', encoding='ascii')
     print(f'{boot}\n{boot.stat().st_size} bytes; {len(trees)} original DTBs; Qualcomm wrapper={wrapped}; SHA256 {sha}')
-    print('Built only. Hardware boot NOT tested. This image does not run XNU.')
+    print('Built only. Hardware boot NOT tested.' +
+          (' Contains experimental single-CPU XNU.' if xnu_payload else ' This image does not run XNU.'))
 
 
 if __name__ == '__main__':

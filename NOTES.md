@@ -4,6 +4,18 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+CI started: https://github.com/edeegg/ios-topaz/actions/runs/39454541376
+(commits 5947680 / 4bcaaa6). Build currently running. Initial workflow_dispatch
+returned 404 because the fork had not registered the workflow on its default
+branch; explicit push trigger on cepheus-bringup successfully started the run.
+Phone RECONNECTED: adb kill-server, ADB_LIBUSB=1, adb start-server restored
+root recovery, product cepheus. No need to change drivers or USB/IP bindings.
+Minimal cepheus XNU loader C and shared loader/fdt compiled and linked locally
+with -Werror, no undefined symbols or ABS64 C relocations. Added --payload to
+the existing v0 builder, guarded against wrong high RAM/CPU/storage ADT.
+Details and commands in CEPHEUS.md. No XNU boot image generated until real
+kernel artifact arrives. No phone partition write or reboot in this turn yet.
+
 User explicitly requested real kernel adaptation, compilation and temporary tests
 on the Mi 9, keeping large working files on G and avoiding host memory overload.
 `tools/stage-xnu-patches.py --board cepheus` stages ONLY patches 0001-0018:

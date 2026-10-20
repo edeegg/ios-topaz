@@ -1,5 +1,37 @@
 # Xiaomi Mi 9 (cepheus): initial bring-up
 
+## Real XNU console build, 2026-10-20
+
+CI run: https://github.com/edeegg/ios-topaz/actions/runs/39454541376
+Source commits 5947680 and 4bcaaa6 on owned fork branch `cepheus-bringup`.
+`--board cepheus` stages only 0001-0018, changes early geometry to 1080x2340
+(candidate stride 4320), and labels the CPU Kryo 485. Uses shared SWEET config,
+plain arm64, single CPU, GICv3 Group1 and 19.2MHz virtual timer. No storage,
+input, USB, modem, direct display, cpufreq or battery drivers are included.
+This first build targets kernel console bring-up, not iOS userland.
+
+`shim/cepheus-xnu.c` refuses XNU handoff unless entry is EL1, MMU/D-cache off,
+MPIDR affinity zero, 16K translation supported and CNTFRQ=19200000. It uses
+the existing segment/boot_args loader and does not start secondary CPUs.
+The Windows-native builder accepts `--payload` from mkpayload.py, checks the
+known high RAM bank and single-CPU no-storage cepheus ADT, and preserves the
+stock Qualcomm wrapper and four original DTBs. Loader and dependencies compile
+and link with LLVM warnings-as-errors, no unresolved symbols or C ABS64 relocs.
+
+Preparation after downloading the real CI kernel:
+
+```powershell
+python tools/mkadt-cepheus.py --live-dtb research/cepheus/live-recovery.dtb --boot-mpidr 0 --out shim/out/cepheus-console-candidate.adt
+python tools/mkpayload.py KERNEL shim/out/cepheus-console-candidate.adt shim/out/cepheus-xnu-payload.bin --cmdline 'debug=0xc serial=3 cpus=1 keepsyms=1 -enable_kprintf_spam'
+python tools/build-cepheus-probe.py --stock-boot ../woa-mi9/partition_backup/partitions/boot.img --payload shim/out/cepheus-xnu-payload.bin
+```
+
+Reconfirmed root recovery ADB after starting adb with ADB_LIBUSB=1. A tiny
+Linux user-mode CPUID helper ran from recovery /tmp and returned MIDR 51df804e,
+MMFR0 ff000000, ISAR0 100010211120, CNTFRQ 124f800. Linux emulates/sanitizes
+ID register reads at EL0, so this MMFR0 does NOT establish hardware 16K support,
+and the running Linux CPU is NOT proof of the ABL entry CPU. No partition writes.
+
 ## Latest session: firmware staged, hardware boot unconfirmed
 
 The requested iPhone X iOS 16.7.16 (20H392) IPSW was downloaded from Apple's CDN
