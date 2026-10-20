@@ -4,6 +4,12 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+User requested repeating the SHA1-fixed boot. Reconfirmed recovery product
+cepheus, rebooted to bootloader, productcepheus/unlockedyes checked. Same
+b5addf68... image temporarily booted: Sending18016KB OKAY0.390s,
+BootingOKAY0.170s, total0.994s. Physical screen report PENDING; no flash.
+Root image session3831 continues independently; leave WSL running.
+
 NEW KERNEL BUILT AND TEMPORARILY BOOTED: CI39457341486 SUCCESS; artifact under
 research/cepheus/ci-ufs-kernel/kernel.development.sweet SHA256
 9b59a553ff76bf3d0a02a5741ef2b962b1378a6515c910b93b03505e08ded1fa.
