@@ -4,6 +4,18 @@
 
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
+Sparse conversion session81834 is still RUNNING; image .simg was2.06GB at elapsed
+7m26s. Pass1 scanned entire raw; now writing sparse data. Do not start flash
+until converter exits0 and streaming expanded-hash verifier succeeds. Added
+--write-marker to verifier; it creates .simg.verified with expected rawhash
+ONLY after verifying all chunks, exact expanded size and SHA256.
+Prepared ignored research/windows-builder/flash-sparse-userdata.py: requires
+that marker, validates sparse geometry and live cepheus/unlocked/exactuserdata
+size, then fastboot-S256M flashuserdata while teeing stdout/stderr to
+research/cepheus/ios-sparse-flash.log, records FASTBOOT_EXIT_CODE. Its TEMP/TMP
+are explicitly G. Run it once after sparse verification; track session result.
+Raw image and new iOS kernel remain validated. Phone still in fastboot.
+
 IMPORTANT RAW FLASH FAILED: session30445 exited1 with uncaught std::bad_alloc,
 before any Sending/Writing/Erasing output. Do not claim installation success.
 Installed Windows fastboot36.0.2 is PE machine0x14c (32-bit), cannot handle this

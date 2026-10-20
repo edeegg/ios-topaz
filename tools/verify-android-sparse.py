@@ -70,5 +70,10 @@ if __name__ == '__main__':
     parser.add_argument('image', type=Path)
     parser.add_argument('--sha256', required=True)
     parser.add_argument('--size', required=True, type=int)
+    parser.add_argument('--write-marker', action='store_true')
     args = parser.parse_args()
     verify(args.image, args.sha256, args.size)
+    if args.write_marker:
+        Path(str(args.image) + '.verified').write_text(
+            f'expanded_sha256={args.sha256.lower()}\nexpanded_size={args.size}\n',
+            encoding='ascii')
