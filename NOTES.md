@@ -1,5 +1,60 @@
 # iOS 16 on sweet (Redmi Note 10 Pro, SM7150) - working notes
 
+## Active local handoff: Mi 9 / cepheus, 2026-10-20
+
+User requested porting ios-topaz to Xiaomi Mi 9. This is a NEW target; previous
+sweet/topaz erase approvals do not apply. Preserve Android and Mindows (live
+by-name listing includes mindowsesp/mindowswin), GPT, firmware and backups.
+Detailed findings and reproduction: `CEPHEUS.md`.
+
+### Latest milestone: successful stage-0 compilation (2026-10-20)
+
+User changed session permissions to full access after explicitly requesting
+compilation outside the sandbox. Scoop clang/LLVM now runs. Fixed Windows
+CreateProcess handling: resolve the actual .exe path for ld.lld via shutil.which.
+Compiled and linked the probe with warnings as errors. Artifact:
+`shim/out/cepheus-probe/cepheus-probe-boot.img`, 2,084,864 bytes, SHA256
+`9656472bf90ffde17c0b309f6ad589f84b79600136eef4de9742dee9c45dcc57`.
+Independent offline verification: ELF AArch64, entry=0, no remaining relocations;
+C objects have no ABS64 address relocations; Image size=77824. Boot v0 header,
+SHA-1 ID, padding/size and four stock DTBs (byte-identical) pass. Four parser
+tests pass. No CI needed for this bare-metal diagnostic. No hardware boot or
+device command was issued in this compilation turn. NEXT: verify bootloader
+state and test temporary stage-0 boot, then use measured CPU information to
+continue the XNU hardware port. This milestone supersedes compiler blocker below.
+
+- Initial HEAD was `3eacb48`; no
+  pre-existing worktree modifications observed. Original remote MakrSas/ios-topaz.
+- Added read-only bounded DTB inventory tool and four passing parser/privacy
+  tests. Local boot backup has v0 header/4096 pages and four appended DTBs.
+- User connected ADB: cepheus, Android 16 SDK36, unprivileged/no su, 1080x2340.
+  Android says flash.locked=1 / green; actual fastboot state remains UNKNOWN.
+  Do not unlock. User then independently entered custom recovery; ADB uid=0.
+- Pulled live FDT and iomem to ignored `research/cepheus/`. Actual SM8150 v2,
+  board 0x25/0, RAM banks 0x80000000+0x3cc00000,
+  0x140000000+0xc0000000, 0xc0000000+0x80000000. High bank is 3 GiB.
+  GICD/GICR 0x17a00000/0x17a60000, UFS 0x1d84000, splash 0x9c000000.
+  Touch st,fts @0x49, GENI 0xc80000, GPIO122. DRM reports 1080x2340 60Hz.
+- Added separate CPU-only probe C and LLVM/v0-image builder, preserving stock
+  DTBs and avoiding all topaz loader/UFS/clock/CPU_ON code. No image produced:
+  both Scoop LLVM and NDK clang returned permission denied in this environment.
+  No CI build submitted; compilation/linking/hardware execution unverified.
+- Candidate ADT generator validates live cepheus identity, high RAM against
+  reservations and boot MPIDR membership. Generated 3940-byte console-only ADT
+  in ignored shim/out. MPIDR 0 is an OFFLINE candidate, not measured. Missing
+  research/ipsw-x/d22ap.adt warns; no Apple artifact downloaded.
+- No reboot, unlock, partition write, mount or fastboot boot was performed.
+  Phone was left in the user's custom recovery. Existing topaz XNU patches are
+  untouched and unsafe for cepheus; no XNU/iOS boot claimed.
+- NEXT: obtain a working ARM64 cross-compiler, compile/link/inspect probe,
+  verify bootloader state and temporary diagnostic boot. Audit topaz kernel's
+  hardcoded hardware accesses before attempting any XNU image.
+- Commit attempt failed: `git add` and `git commit` report `fatal: unable to
+  write new index file` in this restricted environment. All changes remain in
+  the working tree; no commit/push. Four parser tests pass, Python syntax check
+  and git diff --check pass. Compiler execution and git index access are the
+  current environment blockers.
+
 ## Agent handoff / active work (2026-10-15, latest)
 
 ### >>> UPDATE 2026-10-18 (read first, then the 10-17 handoff below) <<<
