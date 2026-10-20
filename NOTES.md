@@ -5,6 +5,30 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+TOUCH FULL KERNEL CI39515787870 SUCCESS (commit31c11e4). Artifact onG:
+research/cepheus/ci-touch-kernel/kernel.development.sweet SHA256
+1bde46c56b989c4fe42f1f93c4c10a78e9c63aaa4dd96712ed4999e1500fffc8,
+SHA256SUMS matches. llvm-nm verifies cepheus_touch_init, sweet_hid_touch,
+sweet_console_muted all defined. Built guarded userdata payload with canonical
+platform flags plus sweetfb_noconsole=1 cepheustouch=1, NO sweetfb_native;
+logicalADT1125x2436, physical1080x2340. New MAIN bootimage and stable copy
+shim/out/cepheus-touch-test-boot.img18640896bytes SHA256
+212d40988e35f2c25b9cf08681d48d7252d2a967df45d1bccc37790c84ee539d.
+Payloadshim/out/cepheus-ios-touch.bin, exactargs ignored research/cepheus/
+cepheus-ios-touch-bootargs.txt. Temporary boot NOT YET SENT: adb/fastboot empty,
+user physical recovery-state question pending, WindowsADB interfaces Error.
+User prioritised touch atminimum; do NOT claim touchscreen works or allbugs
+fixed until real test. Once recovery available read latest persistentlog, check
+productcepheus, rebootbootloader/getvars then fastboot boot TOUCH image above.
+Allow45seconds, user test swipe. If fails: returnrecovery readlog for CEPHEUS
+TOUCH clock/fw/chip/error. Driver refuses missingABL I2C firmware, wrongchip;
+may still need true firmware/RPMh power integration. No firmware uploads or
+radio/GPU/Metal/camera/charge fixes. GPIO/buttons still absent. WSL off.
+Display-only fallback ebbd2bd... and previous goodnative136a... preserved under
+names above. No filesystem reflash or other phonewrites this turn.
+
+
+
 DISPLAY FIX CI39515071399 SUCCESS. Kernel saved ci-display-kernel SHA256
 201e1f4922a785270a92b74e9d6ebd63fc40cd472be0430c5b760da980b0cc74.
 Mutable sweet_console_muted atfffffe0007bd54c8 (__DATA), const cons_ops_index
