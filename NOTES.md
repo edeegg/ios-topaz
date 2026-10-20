@@ -5,6 +5,24 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+NEW PHOTO 20261020_190910: display enabled now reaches backboardd surface
+creation1080x2340, then kernel panic "Unexpected fault in kernel static region".
+Exact PC fffffe0007456618 = switch_to_serial_console+0x1c (llvm-nm/objdump on
+current4c3dfab1 kernel), instruction str wzr,[x8], FAR fffffe00071735e0 =
+cons_ops_index in __DATA_CONST. LR fffffe0007a6e33c = PE_initialize_console+0x58.
+Cause is agent-added sweetfb_noconsole=1 calling PE_initialize_console on first
+present, NOT surface memory or CPU incompatibility. Existing patch0067 already
+fixes this via mutable sweet_console_muted; inspect/stage individually later,
+never include hardware0060 merely to reach0067. Immediate diagnostic workaround:
+REMOVE sweetfb_noconsole=1, keep display/native. Rebuilt payload and SAME boot
+image18640896bytes SHA256136a7044add7a0690ac32028d0de64000f1ba24c8ef90359cdafc387234ed817.
+NOT BOOTED YET: adb empty; requested user return recovery. No flash. WSL off.
+Next recovery: read persistent log if available, reboot bootloader check cepheus/
+unlocked then temporary boot new136a image. Console can overlap GUI in this test.
+Audit0067 independently for proper quiet-display kernel rebuild after this test.
+
+
+
 NEW PHOTO 20261020_190251 + PERSISTENT LOG: iOS userland BOOTS. Backboardd[56]
 alive, xpcproxy/AKS daemons running; SpringBoard repeatedly SIGTRAP and heap
 contains "failed to find the main CADisplay". Root/platform fixes work.
