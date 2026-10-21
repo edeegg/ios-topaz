@@ -26,6 +26,7 @@ on:
       - "xnu/patches/**"
       - ".github/workflows/xnu.yml"
       - "tools/stage-xnu-patches.py"
+      - "drivers/cepheus/**"
 
 
 concurrency:
@@ -98,7 +99,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/.ccache
-          key: ccache-${{ env.TARGET_BOARD }}-${{ env.MACHINE_CONFIG }}-${{ env.KERNEL_CONFIG }}-${{ hashFiles('xnu/patches/**', 'tools/stage-xnu-patches.py', '.github/workflows/xnu.yml') }}
+          key: ccache-${{ env.TARGET_BOARD }}-${{ env.MACHINE_CONFIG }}-${{ env.KERNEL_CONFIG }}-${{ hashFiles('xnu/patches/**', 'drivers/cepheus/**', 'tools/stage-xnu-patches.py', '.github/workflows/xnu.yml') }}
           restore-keys: |
             ccache-${{ env.TARGET_BOARD }}-${{ env.MACHINE_CONFIG }}-${{ env.KERNEL_CONFIG }}-
 

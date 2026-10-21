@@ -4,6 +4,27 @@ import argparse
 from pathlib import Path
 
 
+def gpu_backend_patch(root):
+    """Compile the backend only on cepheus-ios; no hardware activation hook."""
+    directory = root / 'drivers/cepheus'
+    files = sorted(p for p in directory.rglob('*') if p.suffix in ('.c', '.h'))
+    sources = [p for p in files if p.suffix == '.c']
+    patch = ('--- a/bsd/conf/files\n+++ b/bsd/conf/files\n'
+             f'@@ -110,2 +110,{2 + len(sources)} @@\n'
+             ' bsd/dev/cepheus_keys.c\t\t\tstandard\n')
+    for path in sources:
+        target = 'bsd/dev/cepheus_gpu/' + path.relative_to(directory).as_posix()
+        patch += '+' + target + '\t\tstandard\n'
+    patch += ' bsd/dev/mem.c\t\t\t\tstandard\n'
+    for path in files:
+        target = 'bsd/dev/cepheus_gpu/' + path.relative_to(directory).as_posix()
+        lines = path.read_text(encoding='utf-8').splitlines()
+        patch += (f'--- /dev/null\n+++ b/{target}\n'
+                  f'@@ -0,0 +1,{len(lines)} @@\n' +
+                  ''.join('+' + line + '\n' for line in lines))
+    return patch
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--board', choices=('topaz', 'cepheus', 'cepheus-ufs', 'cepheus-ios'), required=True)
@@ -46,6 +67,10 @@ def main():
                                                 errors='surrogateescape', newline='\n')
     print(f'{args.board}: staged {len(selected)} patch/helper files')
     if args.board == 'cepheus-ios':
+        # Compiled backend primitives only. Never call GPU programming routines
+        # until the platform establishes their documented hardware prerequisites.
+        (args.destination / '0075-cepheus-gpu-backend.patch').write_text(
+            gpu_backend_patch(source.parents[1]), encoding='utf-8', newline='\n')
         # Authorised target is the EXISTING userdata on this Mi 9, alongside
         # Mindows. Refuse enabling writes for any other partition geometry.
         patch = '''--- a/bsd/dev/sweet_ufs.c

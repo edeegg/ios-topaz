@@ -4,6 +4,16 @@
 
 ### 2026-10-21: A640 backend components implemented, not activated
 
+FOLLOW-UP IN PROGRESS: added A640 RSC/PDC power-sequencer programming from
+pinned Android source. Real CMD DB mx30010/cx30000/xo30090 addresses enforced;
+48 writes and final barrier, checks reject missing power/reset prerequisites.
+Host tests cover failure at each write; ARM64 compilation PASS. This is not
+CM3 firmware/HFI boot and is not called on live hardware yet.
+stage-xnu-patches.py now generates0075 for cepheus-ios only, compiling clock,
+GMU and page-table backend files into XNU. Generated patch git apply --check
+PASS against local keys-patch-check source. Workflow watches backend sources.
+Full CI build about to be submitted; record result before stopping.
+
 ADB confirms f105aefc recovery and ro.product.device=cepheus. Read-only KGSL
 sysfs reports Adreno640v2 and runtime_status=suspended. No boot, flash or root
 filesystem changes in this milestone. WSL remains off; outputs stay on G.
