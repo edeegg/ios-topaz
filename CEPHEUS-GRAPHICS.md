@@ -10,8 +10,19 @@ Thus the diagnostic image did not activate GPU, Metal or panel input.
 The AOP QMP transport is now implemented as a tested callback-based component:
 descriptor/range validation, link/channel handshake, exclusive ownership,
 message ordering, busy handling and bounded completion waits. No live AOP
-adapter or RPMh regulator votes are invoked yet. A consumed message alone will
+adapter had been invoked in that diagnostic boot. A new optional
+`cepheusgpu_aop=1` adapter now requests the OEM GPU NoC workaround and verifies
+actual CX power, without changing RPMh rail levels or clock rates. It does not
+start GMU/GX. The RPMh transport separately requires validated inherited and
+aggregate rail policy before permitting any vote. A consumed message alone will
 not qualify a powered GPU; resource votes and hardware readback remain required.
+
+Pinned Android `arm_smmu_of_xlate` confirms the second DT IOMMU cell is an SMR
+mask, not protection flags. GPU user SID0/mask401 covers0,1,400,401; GMU user
+SID4/mask400 covers4,404 and kernelSID5/mask400 covers5,405. The exact-match
+reference stream API cannot be used by treating those masks as flags. The
+touch GPI streamSID7b6 has mask0. Shared APPS SMMU policy must preserve unrelated
+boot-firmware masters; a global fault-on-unmatched change is not implicit.
 
 The user has re-enabled Metal in the task scope. Volume buttons are user-confirmed working. The ambiguous GPU/touch report still needs clarification; current code and logs do not demonstrate XNU GPU execution.
 

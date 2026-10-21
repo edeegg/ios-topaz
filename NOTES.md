@@ -4,6 +4,18 @@
 
 ### 2026-10-21: A640 backend components implemented, not activated
 
+CRITICAL SMMU interpretation correction from actual pinned arm-smmu.c
+arm_smmu_of_xlate(): second iommus cell is SMR MASK, not flags. Earlier notes
+calling401/400 flags are inaccurate. GPU userSID0/mask401 covers0,1,400,401;
+GMU user4/mask400 covers4,404; GMU kernel5/mask400 covers5,405. GPI SID7b6
+has mask0 (exact). Generic reference stream kit only supports exact matches,
+so GPU masked routes need qualified enumeration/ownership, not copied masks
+as protection flags. Pinned arm-smmu.c now saved touch-reference.
+APPS shared-SMMU DT15000000+100000; do not change global unmatched-stream
+bypass/fault policy blindly (other boot-firmware masters/display may use it).
+Reference SMMU stream/program code requires global fault policy and fault
+handlers and is NOT automatically suitable for shared APPS SMMU/GPI.
+
 FOLLOW-UP user insists both bugs. Contact/QMP CI39588046575 at27d006b SUCCESS;
 kernel downloaded ci-contact-qmp-kernel SHA256 verified:
 a2ac43f8188d94f2b4b5da507b94e5fba110efc9b67cc31b0b3e2c0f72ce2ae1.
