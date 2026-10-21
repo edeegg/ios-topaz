@@ -2,6 +2,38 @@
 
 ## Active local handoff: Mi 9 / cepheus, 2026-10-20
 
+### 2026-10-21: A640 backend components implemented, not activated
+
+ADB confirms f105aefc recovery and ro.product.device=cepheus. Read-only KGSL
+sysfs reports Adreno640v2 and runtime_status=suspended. No boot, flash or root
+filesystem changes in this milestone. WSL remains off; outputs stay on G.
+
+New drivers/cepheus/adreno640_clock.c implements pinned A640 HWCG and GBIF
+sequences, typed GPU/GMU callbacks, chip06040001 guard and explicit prerequisites.
+No live MMIO adapter or kernel integration. Register extractor retained.
+tools/check-cepheus-a640-clock.py PASS: sequencing, failure stops, RMW and real
+arm64-apple-ios16.0 Mach-O object compilation. Not hardware execution proof.
+
+New gpu_tables.c wraps unchanged MIT ArmSmmu4K core revision4d0d659 to build
+inactive GPU4K tables from caller-owned CPU16K allocations. Explicit output
+address width; no assumed live hardware configuration. Tests walk all four
+4K leaves of a16K buffer above4GiB, check table pool overlap/budget/alignment,
+and compile both components for ARM64. check-cepheus-gpu-tables.py PASS.
+Initial host test link failed on implicit memset from aggregate initialization;
+explicit field assignments removed that CRT dependency, then checks passed.
+
+Earlier collection saved cmd-db-live.txt with actual cx/mx/gfx/xo resource
+addresses/levels under ignored research/cepheus/gpu-reference. Reading recovery
+clk_summary dropped ADB temporarily; do not repeat that callback. Recovery now
+responds again. Latest persistent keys log confirms power and volume+ events;
+touch still blocked by GENI GSI-only transport. Do not call touch fixed.
+
+GPU/Metal remain unfinished. Next: verify A640 SMMU context configuration and
+GMU power/firmware startup, provide bounded MMIO and owned physical allocation,
+cache maintenance and CP submission/fence proof before publishing GPU service.
+Metal additionally needs iOS16 plugin ABI and shader toolchain adaptation.
+No new boot image is justified by these unlinked components alone.
+
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 

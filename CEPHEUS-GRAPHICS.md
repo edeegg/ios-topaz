@@ -16,7 +16,22 @@ Parent revision: UniXNU/UniXNU fb2bb310564ce66779e472a021881cf7c5764919
 - AdrenoPM4: `445f8fe6d115738352b9d78dc70af6d61aa7f62f`
 - ArmSmmu4K: `4d0d6598b1a36aeec3de01091893fa6660e49388`
 
-Sources reside only in ignored research/cepheus/unixnu-reference on G. Clones are shallow and non-recursive; Mesa and the full shader toolchains were not downloaded.
+Reference trees reside in ignored research/cepheus/unixnu-reference on G. Downloads are shallow and non-recursive; Mesa and the full shader toolchains were not downloaded. The unchanged MIT ArmSmmu4K core is now vendored with its license and pinned provenance under drivers/cepheus/third_party.
+
+## Implemented components, not yet connected to XNU
+
+`drivers/cepheus/adreno640_clock.c` implements A640 HWCG/GBIF sequences with
+separate GPU/GMU register domains and explicit chip/power/quiescence guards.
+`gpu_tables.c` builds inactive GPU4K tables in CPU16K allocations. It requires
+caller-owned physical memory and an explicitly verified output address width.
+Neither component activates hardware or publishes an accelerator service.
+
+Run `python tools/check-cepheus-a640-clock.py` and
+`python tools/check-cepheus-gpu-tables.py` on Windows LLVM. Both pass host
+behavior tests and compile actual ARM64/iOS objects. The table test walks
+translations above4GiB and rejects overlapping table memory, insufficient leaf
+budgets and misaligned CPU allocations. These are component tests, not proof
+of GPU execution, coherent SMMU walks or Metal support.
 
 ## Required adaptations
 
