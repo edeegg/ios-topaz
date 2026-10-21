@@ -28,6 +28,9 @@ Neither component activates hardware or publishes an accelerator service.
 
 The cepheus-ios build now stages these sources as XNU BSD objects through
 generated patch0075. Other board builds do not include this backend.
+Full XNU build39582019432 at8de7143 passed. The final kernel contains the
+backend symbols (verified with llvm-nm), but has no startup hook that activates
+them. Kernel SHA256:8c064f0795ceed53fee57b97f77dc084428fe2517c612e9ce08cc52ccd5b9ccc.
 `adreno640_gmu.c` programs A640 RSC/PDC sequencing using the Mi9 CMD DB addresses;
 it requires externally verified CX/clocks/reset-held/exclusive prerequisites.
 `adreno640_mmio.c` translates global GMU DWORD indices from1a800 and bounds

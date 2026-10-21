@@ -28,7 +28,20 @@ verified ITCM0+4000,ICACHE4000+3c000,DTCM40000+4000,DCACHE44000+3c000.
 Do not confuse cache-backed firmware with additional physical TCM.
 Live DT also confirms KGSL SMMU2ca0000+10000,3-level tables,skip-init,
 gfxuser stream0 flags401,GMUuser4/kernel5 flags400; no live SMMU writes made.
-New MMIO/firmware objects to be included by next CI revision.
+FINAL CI39582019432 for8de7143 SUCCESS. Seven backend C sources have explicit
+compile commands in saved gpu-reference/ci-a640-backend-39582019432.log.
+Full kernel downloaded to research/cepheus/ci-a640-backend-kernel/
+kernel.development.sweet (17200520bytes); artifact SHA256SUMS verified:
+8c064f0795ceed53fee57b97f77dc084428fe2517c612e9ce08cc52ccd5b9ccc.
+llvm-nm confirms linked a640_gmu_upload,a640_gmu_program_sequences,a640_mmio_*
+and cepheus_gpu_tables symbols in the final kernel, not just standalone objects.
+No init hook calls them yet. NO GPU hardware execution or Metal support claimed.
+No new boot image made: merely booting these inactive components would not test
+GPU startup. Device remains recovery; no partition changes. WSL not started.
+Next actual integration requires verified CX/GX regulator/clock/reset sequencing,
+owned physical cache/HFI memory, active SMMU contexts and coherency, then GMU HFI,
+ZAP secure transition and CP submission/fence completion. Metal frontend and
+AIR/Turnip runtime are still unported to this iOS16/A640 combination.
 
 ADB confirms f105aefc recovery and ro.product.device=cepheus. Read-only KGSL
 sysfs reports Adreno640v2 and runtime_status=suspended. No boot, flash or root
