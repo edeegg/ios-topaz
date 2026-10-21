@@ -5,6 +5,29 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+FAILED FIRST TOUCH TEST now diagnosed from real recovery log. Saved
+research/cepheus/ios-touch-failed.bin/.txt (SWEETLOG223615bytes flush258).
+Correct212d kernel/args verified by log: AppleCLCD physical1080x2340, logical
+1125x2436, noconsole1,cepheustouch1. Touch gccvote0x16,DFS0x21; stops at
+S_AHB branch1e008 value80000002. This is HWCG idle, not a missingclockvote:
+real SM8150 clk-branch.c clk_branch_wait explicitly skips HALT when hwcgbit1.
+Added0070-cepheus-touch-hwcg-console.patch, fixes that predicate and constrains
+TLMM mapping to actualDT0xdc2000bytes. Also mute direct fbcon_transmit_data
+(kprintf bypasses _cnputs), preserves panic_active output. Native Windows REAL
+arm64 objects for both changed C files compilePASS. Commitba141d8 pushed,
+CI39518429772 running; next temporary boot only after fullbuildsuccess.
+Phone STILL recovery and adb alive. No raw MMIO or debugfs mounts this turn.
+Collected recoverydmesg265753bytes,input,platform/rpmsg,USB/battery sysfs and
+peripheral-live-map.json under ignoredresearch/G. Touch onlyfailedHWCG so far;
+no chipID/firmware outcome yet. Newboot stillneeds45sec+swipeconfirmation.
+Downloaded open-source WOA Project-Aloha/STFingerTipS521-Touch pinnedrevision
+in research/cepheus/woa-touch-source/revision.txt. WOA uses same scanA00001,
+optionally toggles off50ms/on; no reason to upload/flash touchfirmware yet.
+CEPHEUS.md now accurately lists ALL requested hardware status and blockers;
+GPU/Metal/radios/camera/fastcharge/buttons remain unported, not fixes claimed.
+
+
+
 TOUCH IMAGE NOW TEMPORARILY BOOTED: user returned recovery, adb productcepheus
 and stable touchimage SHA256212d4098... verified. Saved prior console log via
 read-only last1025userdata blocks to research/cepheus/ios-before-touch-test.bin/

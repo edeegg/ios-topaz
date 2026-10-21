@@ -1,4 +1,37 @@
-# Xiaomi Mi 9 (cepheus): initial bring-up
+# Xiaomi Mi 9 (cepheus): experimental XNU/iOS port
+
+## Current hardware status (2026-10-20)
+
+The user has observed the iOS lock screen on real hardware. This is an
+experimental XNU/iOS port, not a complete hardware-supported installation.
+The older bring-up entries below describe earlier stages.
+
+| Function | Observed state / remaining work |
+| --- | --- |
+| XNU, UFS, HFS root, launchd | Boot confirmed; writes constrained to the existing userdata geometry. |
+| Lock screen / compositor | User-confirmed lock screen; CPU copies to ABL framebuffer, no GPU acceleration. |
+| Console overlay | `_cnputs` mute was insufficient for direct kprintf; patch0070 also gates the framebuffer serial backend, retaining panic display. Physical verification pending. |
+| Red status bar | Logical iPhone X canvas1125x2436 is confirmed in persistent log; panel remains1080x2340. Need user verification of the current image. |
+| Touch | ST FTS521 at I2C0x49 on SE17. First test stopped before chip access on S_AHB HWCG/HALT. Patch0070 follows the Linux clock driver's HWCG exception; new physical test pending. |
+| Buttons | Not ported. Live FDT maps power/volume-down to PM8150 PON; volume-up to PM8150 GPIO6; assistant key to TLMM GPIO97. Requires a reviewed Mi9 SPMI/input implementation. |
+| GPU / Metal | Not implemented. Requires Adreno command/memory/scheduling support and compatible iOS graphics services/userspace; Windows GPU binaries are not XNU drivers. |
+| Wi-Fi | Not implemented; requires SM8150 connectivity power, firmware, bus and network integration. Original Topaz WLAN node intentionally excluded. |
+| Bluetooth | Not implemented; requires transport, controller firmware and iOS interface integration. Launching bluetoothd does not establish hardware support. |
+| Cellular data | Not implemented; modem remoteproc/shared-memory/transport and iOS radio integration remain. Preserve modem/calibration partitions. |
+| Camera | Not implemented; requires sensor power/I2C, CSI/ISP and compatible camera services. |
+| Fast charging | Not implemented; PMIC/USB negotiation, thermal control and actual battery telemetry need validation before higher-current operation. |
+
+The local Windows BSP under `woa-mi9/drivers/extracted` supplies useful device
+identifiers and firmware/configuration references, not directly loadable XNU
+drivers. The open-source [Project Aloha FTS521 driver](https://github.com/Project-Aloha/STFingerTipS521-Touch)
+and pinned Android kernel references are saved under ignored research paths on G.
+The [Mi9 Windows BSP status](https://github.com/qaz6750/XiaoMi9-Drivers/blob/main/Status.md)
+itself lists only slow charging and incomplete camera support; its GPU support
+must not be interpreted as iOS Metal support.
+
+Do not claim a function fixed from compilation or fastboot acceptance. Every
+input/display change needs a real-device test and a subsequent persistent log.
+
 
 ## First observed XNU panic and next storage stage
 
