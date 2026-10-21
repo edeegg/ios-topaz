@@ -5,6 +5,22 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+BUTTON PROTOTYPE PREPARED0072 (not pushed until runningCI finishes): uses
+existing project's read-only SPMI observer logic with VERIFIED Mi9 liveFDT
+corec440000,observere600000,cnfgc40a000,EE0. PM8150 SID0 PON0810 forpower/
+volumedown; GPIO6 atC510/APIDPPID0x0c5 forvolumeup (notTopazSID4GPIO2).
+Opt-in cepheuskeys1, defaultsOFF, started from30s delayedtouchworker beforeGCC.
+No PMIC config, IRQ ack/reset or regulator writes. GPIOmode/inputenable checked,
+unsupportedarbiter versions refused. Local realarm64 object compilePASS; patch
+integration and targetisolationPASS. Hardware buttons NOT yet validated.
+Recovery GPU reportsAdreno640v2; USB typeUSB, batterytemp24.2C. Enumerated vendor
+sde53/modemsde52/dspsde48 links. Attempted read-only,noload vendor mount at/tmp/
+cepheus-vendor-ro: resourcebusy; did NOT unmount/changeexistingblockusers or
+force it. No firmware dumped/flashed. Only temporary recoveryRAMdir created.
+Currentphone still recovery. CI39518429772 touchHWCG/displaymute build running.
+
+
+
 FAILED FIRST TOUCH TEST now diagnosed from real recovery log. Saved
 research/cepheus/ios-touch-failed.bin/.txt (SWEETLOG223615bytes flush258).
 Correct212d kernel/args verified by log: AppleCLCD physical1080x2340, logical
