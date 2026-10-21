@@ -40,6 +40,7 @@ def main():
     check_component('gmu')
     check_component('mmio')
     check_component('qmp')
+    check_component('rpmh')
     print('Hardware execution and GPU/Metal support are NOT validated by this check.')
 
 

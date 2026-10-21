@@ -4,6 +4,33 @@
 
 ### 2026-10-21: A640 backend components implemented, not activated
 
+FOLLOW-UP user insists both bugs. Contact/QMP CI39588046575 at27d006b SUCCESS;
+kernel downloaded ci-contact-qmp-kernel SHA256 verified:
+a2ac43f8188d94f2b4b5da507b94e5fba110efc9b67cc31b0b3e2c0f72ce2ae1.
+No new hardware image booted from this build. Recovery evdev30s capture had
+ZERO events (user gesture performance unconfirmed); do not infer panel failure.
+Recovery IPC logs now collected safely (debugfs mounted; NO clk_summary reads):
+touch-reference/gpi_dmac00000*-live.log andi2c-*-live.log. Actual GPII1 TX0/RX1,
+protocol3,64TRE,priority0; i2c-2 currently performs successful addr49 W1/R8 reads.
+Early channel-error messages do not imply a currently failed bus; recent I2C
+transactions return2. DMA DT args are CHID,SEID0,protocol3,TRE64,priority0;
+GPII allocation is dynamic among maskfa, NOT a literal gpii0 from DT.
+
+NEW AOP EXPERIMENT prepared: gpu_aop_xnu.c called only under
+cepheusgpu_probe1 + cepheusgpu_aop1. Maps verified always-on AOP msgRAM/doorbell,
+validates/negotiates QMP ownership, sends exact OEM96-byte
+{class: clock, res: gpu_noc_wa}, polls actual CX GDSCR confirmation. No direct
+GDSCR writes, no RPMh voltage/clock-rate changes, no GX/GMU start. On any
+protocol/power failure stop. Existing firmware rail settings retained. Both
+AOP runtime adapter and probe compile to real local ARM64 objects (0of2).
+New RPMh active-TCS primitive and tests also compile/PASS; NO LIVE CALLER.
+Requires explicit verified inherited/aggregate voltage policy before any vote;
+positive index alone can lower an existing higher vote, so guard is mandatory.
+Host tests cover free-TCS choice, other IRQ-bit preservation, fresh completion,
+I/O fail-stop and timeout poisoning; local kernel-context object compile PASS.
+APPS DRV2 verified DT is18220000+1000/config,18220d00+3000/TCS,activeTCS0/1.
+Next full CI/boot to qualify ONLY AOP CX request; not a GPU/Metal fix claim.
+
 LATEST RECOVERY RESULTS: user reports GPU/Metal unavailable, hold/drag failing.
 Collected ignored gpu-reference/ios-gpu-probe-result.bin/.txt: SWEETLOG228761B,
 flush199, exact probe1/memtest1 bootargs. Actual GPUCC CX/GX GDSCR both00222001

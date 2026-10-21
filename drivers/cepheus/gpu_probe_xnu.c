@@ -11,6 +11,7 @@
 #include <machine/machine_routines.h>
 #include <pexpert/pexpert.h>
 #include "gpu_memory_xnu.h"
+#include "gpu_aop_xnu.h"
 
 extern vm_offset_t ml_io_map(vm_offset_t, vm_size_t);
 extern kern_return_t thread_terminate(thread_t);
@@ -59,6 +60,7 @@ static void gpu_probe_thread(void *arg, wait_result_t result)
     printf("CEPHEUS GPU PROBE: gx-domain=%08x cx-hwctrl=%08x\n",
         gpucc_read(base, 0x508), gpucc_read(base, 0x540));
     printf("CEPHEUS GPU PROBE: done, no hardware state changed\n");
+    cepheus_gpu_aop_start(base);
 out:
     {
         int memory_test = 0;
