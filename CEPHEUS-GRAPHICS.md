@@ -2,6 +2,17 @@
 
 Status: backend components compiled into XNU; optional power/memory diagnostic temporarily booted. GPU execution and Metal remain unvalidated.
 
+The collected Mi9 diagnostic log now confirms both CX/GX power domains off
+(GDSCR00222001 each) and a successful owned-memory/inactive-table test. The
+touch driver stopped at its GSI_ONLY guard, with no physical touch events.
+Thus the diagnostic image did not activate GPU, Metal or panel input.
+
+The AOP QMP transport is now implemented as a tested callback-based component:
+descriptor/range validation, link/channel handshake, exclusive ownership,
+message ordering, busy handling and bounded completion waits. No live AOP
+adapter or RPMh regulator votes are invoked yet. A consumed message alone will
+not qualify a powered GPU; resource votes and hardware readback remain required.
+
 The user has re-enabled Metal in the task scope. Volume buttons are user-confirmed working. The ambiguous GPU/touch report still needs clarification; current code and logs do not demonstrate XNU GPU execution.
 
 ## Public source baseline

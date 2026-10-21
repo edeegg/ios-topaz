@@ -53,13 +53,15 @@ def main():
     cepheus_display = {'0061-cepheus-logical-display.patch', '0067-sweet-console-mute.patch',
                        '0068-cepheus-st-fts521-touch.patch',
                        '0070-cepheus-touch-hwcg-console.patch', '0072-cepheus-pmic-keys.patch',
-                       '0074-cepheus-touch-small-pin-maps.patch'}
+                       '0074-cepheus-touch-small-pin-maps.patch',
+                       '0076-cepheus-touch-contact-lifetime.patch'}
     selected = sorted(p for p in source.iterdir()
                       if p.suffix in ('.patch', '.sh') and
                       ((args.board == 'topaz' and p.name not in
                         {'0061-cepheus-logical-display.patch', '0068-cepheus-st-fts521-touch.patch',
                        '0070-cepheus-touch-hwcg-console.patch', '0072-cepheus-pmic-keys.patch',
-                       '0074-cepheus-touch-small-pin-maps.patch'}) or
+                       '0074-cepheus-touch-small-pin-maps.patch',
+                       '0076-cepheus-touch-contact-lifetime.patch'}) or
                        (args.board == 'cepheus-ios' and p.name in cepheus_display) or
                        int(p.name[:4]) <= (59 if args.board == 'cepheus-ios' else
                                           34 if args.board == 'cepheus-ufs' else 18)))

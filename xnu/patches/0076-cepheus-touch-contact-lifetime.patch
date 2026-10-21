@@ -1,0 +1,46 @@
+--- a/bsd/dev/cepheus_touch.c
++++ b/bsd/dev/cepheus_touch.c
+@@ -269,7 +269,11 @@
+ 	printf("CEPHEUS TOUCH: se17 fw=%#x proto=%u status=%#x tx=%#x rx=%#x ios=%#x\n",
+ 	    fw, (fw >> 8) & 0xffu, touch_rd(st.se, SE_STATUS), tx, rx,
+ 	    touch_rd(st.se, 0x908));
+-	if (((fw >> 8) & 0xffu) != 3u || (touch_rd(st.se, 0x64) & 1u) ||
++	if (touch_rd(st.se, 0x64) & 1u) {
++		printf("CEPHEUS TOUCH: GSI_ONLY requires GPI DMA and SMMU; no panel events started\n");
++		return false;
++	}
++	if (((fw >> 8) & 0xffu) != 3u ||
+ 	    ((tx >> 24) & 0x3fu) != 32u || ((rx >> 24) & 0x3fu) != 32u ||
+ 	    ((tx >> 16) & 0x3fu) < 2u || ((rx >> 16) & 0x3fu) < 2u) {
+ 		printf("CEPHEUS TOUCH: need ABL-loaded I2C firmware and 32-bit FIFOs; probes skipped\n");
+@@ -324,6 +328,11 @@
+ static void
+ touch_event(const uint8_t e[8])
+ {
++    /* Reset/error payloads do not contain a pointer slot ID. */
++    if (e[0]==0x03 || e[0]==0xf3) {
++        touch_release_all();
++        return;
++    }
+     unsigned id=e[1]>>4, type=e[1]&15u;
+     if (id>=TOUCH_MAX) return;
+     if (e[0]==0x33) {
+@@ -335,8 +344,6 @@
+         if (x>=1080 || y>=2340) return;
+         st.x[id]=(int)x; st.y[id]=(int)y; st.active|=1u<<id;
+         sweet_hid_touch(id,1,(int)x,(int)y);
+-    } else if (e[0]==0x03 || e[0]==0xf3) {
+-        touch_release_all(); /* reset/error events cannot leave stuck contacts */
+     }
+ }
+ 
+@@ -380,7 +387,8 @@
+             if (!(event[7]&31u)) break;
+         }
+         if (err) {
+-            touch_release_all();
++            /* A missed poll is not a finger-up. Keep contact identity across
++             * transient transport errors; fatal stop below releases all. */
+             if (++errors>=10) break;
+         } else errors=0;
+         touch_wait(10);

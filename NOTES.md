@@ -4,6 +4,34 @@
 
 ### 2026-10-21: A640 backend components implemented, not activated
 
+LATEST RECOVERY RESULTS: user reports GPU/Metal unavailable, hold/drag failing.
+Collected ignored gpu-reference/ios-gpu-probe-result.bin/.txt: SWEETLOG228761B,
+flush199, exact probe1/memtest1 bootargs. Actual GPUCC CX/GX GDSCR both00222001
+(PWR_ON31=0,SW_COLLAPSE0=1),AHB80000001,CXGMU80004220,GXGMU80000000,
+CXAPB80000000,CXO-AON0,CXO80000001;resets0;GXdomain003c0001,CXhwctrl00005ff4.
+Actual on-device owned memory allocation and inactive4K table walk PASS.
+No GPU power/command execution is established. Not a failed Metal driver test:
+there is still no active Metal implementation.
+Touch driver logged GENI GSI_ONLY guard and stopped before ANY panel events.
+No SWEET HID touch down/up lines. Async clarification pending whether single
+touch works in this exact image or user refers to another image. Do not infer
+touch working from the symptom wording.
+
+New0076 fixes two contact-lifetime bugs: transient I2C poll errors no longer
+synthesize finger-up (terminal stop still releases all); reset/error frames
+handled before pointer slot validation. Clear GSI_ONLY diagnostic preserves
+the hardware guard; NO fake FIFO fallback. tools/check-cepheus-touch-contacts.py
+applies actual0070/72/74/76 and runs actual event/poll C code against controlled
+input: enter/hold/move/up, transient reads, fatal10errors, reset with non-slot
+payload PASS. Transport mocked, so physical gestures still NOT qualified.
+New a640 QMP transport source implements validated4KiB descriptor negotiation,
+exclusive APSS link, bounded timeouts, no in-flight message clobber, ordered
+payload-before-length/doorbell and no retry after uncertain completion. Host
+protocol tests and ARM64 compile PASS. No live adapter/power votes invoked.
+Existing check-cepheus-a640-clock.py includes QMP tests. Actual kernel-context
+object compilation of new QMP and patched touch C PASS (0of2), output
+research/cepheus/contact-qmp-objects. Full CI pending this revision.
+
 LATEST HARDWARE TEST: memory-enabled fullkernel CI39584062149 SUCCESS atdf1852c.
 Both gpu_memory_xnu.c and gpu_probe_xnu.c compilation confirmed in saved
 gpu-reference/ci-gpu-probe-39584062149.log. Downloaded ci-gpu-probe-kernel;
