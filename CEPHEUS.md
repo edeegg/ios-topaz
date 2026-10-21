@@ -12,7 +12,7 @@ The older bring-up entries below describe earlier stages.
 | Lock screen / compositor | User-confirmed lock screen; CPU copies to ABL framebuffer, no GPU acceleration. |
 | Console overlay | `_cnputs` mute was insufficient for direct kprintf; patch0070 also gates the framebuffer serial backend, retaining panic display. Physical verification pending. |
 | Red status bar | Logical iPhone X canvas1125x2436 is confirmed in persistent log; panel remains1080x2340. Need user verification of the current image. |
-| Touch | ST FTS521 at I2C0x49 on SE17. First test stopped before chip access on S_AHB HWCG/HALT. Patch0070 follows the Linux clock driver's HWCG exception; new physical test pending. |
+| Touch | ST FTS521 at I2C0x49 on SE17. First test stopped before chip access on S_AHB HWCG/HALT. Patch0070 handles HWCG; photo then identified a14MB I/O mapping allocation panic. Patch0074 maps only the pin windows; new physical test pending. |
 | Buttons | Experimental PM8150 read-only prototype compiled; real test pending. Live FDT maps power/volume-down to PM8150 PON; volume-up to PM8150 GPIO6; assistant key to TLMM GPIO97. Requires a reviewed Mi9 SPMI/input implementation. |
 | GPU / Metal | XNU driver not implemented; Metal explicitly deferred. Recovery KGSL query succeeds with stock firmware: chip06040001, GMEM1MiB. Requires Adreno command/memory/scheduling support and compatible iOS graphics services/userspace; Windows GPU binaries are not XNU drivers. |
 | Wi-Fi | Not implemented; requires SM8150 connectivity power, firmware, bus and network integration. Original Topaz WLAN node intentionally excluded. |

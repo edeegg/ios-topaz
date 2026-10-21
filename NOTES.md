@@ -5,6 +5,33 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+SMALL-MAP INPUT KERNEL CI39519866978 SUCCESS. SHA256SUMS verified fullkernel
+3612f9b5bcda0e7a51c5dc8fd762a83e598348204490723b7da3ec7e22d975bf at
+research/cepheus/ci-input-smallmap-kernel/kernel.development.sweet.
+Two guardedlogicalADTimagesprepared withnoconsole1/cepheustouch1:
+- shim/out/cepheus-touch-smallmap-boot.img, keys0, SHA256
+ fe222516eacb38d13c97ca29978de133297f74f08bd476191cbca80f3f518104.
+- shim/out/cepheus-touch-keys-smallmap-boot.img, keys1, SHA256
+ 0759628c8a55f5351914c3dea5107d8f149027cd5e8584679c44bbbd986b9cc5.
+Main cepheus-xnu-ios boot path AND user-known cepheus-touch-test-boot.img now
+updated to keys0 fe222516 image (OLD212d file superseded). Exactmanifest
+research/cepheus/smallmap-boot-manifest.json. BOTH have0074 smallpinmaps.
+Only KEYS0 TEMPORARILY BOOTED: recoverycepheus confirmed; ownedvendorfirmware
+RO bind+vendormount cleanlyunmounted; customfirmwaresearch restoredempty.
+Rebootbootloader/productcepheus/unlockedyes, fastbootboot smallmapimage
+SendingOKAY0.396s BootingOKAY0.155s,total0.561s. Await60s/swipe/GUI/panic
+response. HardwaretouchNOT YET validated. Keys1 image remainsUNTESTED.
+GPU recoveryquery successfully loadedstockfirmware only, notGPUexecution or
+XNUacceleration. GPU sources/stockFW/metadatakeptonG, no binaryfirmwarecommitted.
+Metal deferredbyuser. Onnextfailure recoverypullnewlog for GENIcheckpoint,
+se17fw/proto/chip (previousfailure occurredBEFOREseinit from14MBmapping).
+IfGENIprotomissing orFIFOdisabled: don'tforceunsupportedtransfers; investigate
+ABL firmware/GPI interface. DoNOT rebootoldlarge-map e6a5 or oldkeys kernel.
+No otherpartitionwrites/GPTchanges, WSL remainsoff. All otherrequesteddrivers
+stillrequireseparateports. Userexpectsactualvalidation, notcompilesuccess.
+
+
+
 PANIC PHOTO20261020_200851 pinpoints kmem_alloc(...,14434304,0x100021)
 failed3 @vm_kern.c1178, just after GCC line. 14434304=0xdc4000 is the
 16K-rounded14MB TLMM mapping, NOT GPU failure or hostRAM. Recovered persistent
