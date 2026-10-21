@@ -5,6 +5,23 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+HWCG/CONSOLE FIX NOW TEMPORARILY BOOTED: CI39518429772 SUCCESS. Downloaded
+ci-touch-hwcg-kernel; SHA256SUMS verified kernelb427f37ad6731b42819b47d0f9e7495c80999678360c2124a16eda9bb0704b1c.
+Built shim/out/cepheus-touch-hwcg-boot.img (same MAIN cepheus-xnu-ios path)
+SHA256e6a5db43e8387a4a1f9373f71f4c17c8e040961498481315ecdf47334b84ef36,
+18640896bytes, logicalADT and noconsole1/cepheustouch1. Phone productcepheus
+recovery confirmed; rebootbootloader/getvarscepheus/unlockedyes. fastbootboot
+SendingOKAY0.398s BootingOKAY0.152s,total0.569s. NO FLASH. Await user45s/swipe
+and console overlay response (async questions pending). Currentimage hasNOkeys.
+Actual C HWCG predicate executed in native testDLL: PASS idle80000002 accepted,
+genuine M/S halt80000000 and unsupportedDFS rejected. RealobjectcompilePASS.
+Buttonprototypef77044d pushed AFTER priorCIcomplete, newCI39519105259 running.
+Once buttonsCIcomplete download/build distinct combinedtest (addcepheuskeys1),
+but don't reboot active phone without first collecting currenttestresult/log.
+If touchstillfails userreturnrecovery, readnextpersistentlog. No rawMMIO.
+
+
+
 BUTTON PROTOTYPE PREPARED0072 (not pushed until runningCI finishes): uses
 existing project's read-only SPMI observer logic with VERIFIED Mi9 liveFDT
 corec440000,observere600000,cnfgc40a000,EE0. PM8150 SID0 PON0810 forpower/
