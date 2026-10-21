@@ -1,0 +1,65 @@
+--- a/bsd/dev/cepheus_touch.c
++++ b/bsd/dev/cepheus_touch.c
+@@ -60,7 +60,7 @@
+                          (1u << 27) | (1u << 30))
+ 
+ static struct {
+-	vm_offset_t se, gcc, gpio;
++	vm_offset_t se, gcc, gpio_i2c, gpio_reset, gpio_irq, gpio_power;
+ 	bool started, dead;
+ 	int kind, irq_hint;
+ 	uint32_t irq_status, active;
+@@ -108,16 +108,22 @@
+ static void
+ touch_gpio(unsigned pin, unsigned mux, unsigned pull, unsigned drive, bool out)
+ {
+-	uint32_t off = TOUCH_GPIO_CFG(pin);
+-	uint32_t cfg = touch_rd(st.gpio, off);
+-	if (out) {
+-		/* Set the output latch before enabling output, avoiding a reset pulse. */
+-		touch_wr(st.gpio, TOUCH_GPIO_IO(pin),
+-		    touch_rd(st.gpio, TOUCH_GPIO_IO(pin)) | 2u);
+-	}
+-	cfg &= ~0x3ffu;
+-	cfg |= (mux << 2) | pull | (drive << 6) | (out ? 0x200u : 0u);
+-	touch_wr(st.gpio, off, cfg);
++    vm_offset_t bank = 0;
++    uint32_t off = 0;
++    switch (pin) {
++    case 55: bank=st.gpio_i2c; break;
++    case 56: bank=st.gpio_i2c; off=0x1000; break;
++    case 12: bank=st.gpio_reset; break;
++    case 84: bank=st.gpio_power; break;
++    case 122: bank=st.gpio_irq; break;
++    default: return;
++    }
++    if (!bank) return;
++    uint32_t cfg=touch_rd(bank,off);
++    if (out) touch_wr(bank,off+4,touch_rd(bank,off+4)|2u);
++    cfg &= ~0x3ffu;
++    cfg |= (mux<<2) | pull | (drive<<6) | (out ? 0x200u : 0u);
++    touch_wr(bank,off,cfg);
+ }
+ 
+ static bool
+@@ -355,8 +361,18 @@
+     st.gcc=ml_io_map(TOUCH_GCC_PA,0x60000);
+     if (!st.gcc || !touch_clocks()) goto out;
+     st.se=ml_io_map(TOUCH_SE_PA,0x4000);
+-    st.gpio=ml_io_map(TOUCH_NORTH_PA,0xdc2000);
+-    if (!st.se || !st.gpio || !touch_se_init()) goto out;
++    printf("CEPHEUS TOUCH: GCC ready, checking GENI I2C firmware\n");
++    touch_wait(1200); /* persist this checkpoint before the next MMIO phase */
++    if (!st.se || !touch_se_init()) goto out;
++    /* The early I/O virtual map cannot fit the entire 14 MB TLMM aperture.
++     * Map only the verified pin windows; no other GPIO is addressable here. */
++    st.gpio_i2c=ml_io_map(0x03d37000u,0x2000); /* south GPIO55/56 */
++    st.gpio_reset=ml_io_map(0x0390c000u,0x1000); /* north GPIO12 */
++    st.gpio_power=ml_io_map(0x03954000u,0x1000); /* north GPIO84 */
++    st.gpio_irq=ml_io_map(0x03d7a000u,0x1000); /* south GPIO122 */
++    if (!st.gpio_i2c || !st.gpio_reset || !st.gpio_power || !st.gpio_irq) goto out;
++    printf("CEPHEUS TOUCH: pin windows mapped, enabling touch IO\n");
++    touch_wait(1200);
+     /* Only the live-DT touch bus, IRQ, reset, and shared display IO supply. */
+     touch_gpio(55,1,0,0,false);
+     touch_gpio(56,1,0,0,false);
