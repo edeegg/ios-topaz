@@ -1,6 +1,6 @@
 # Mi 9 GPU and Metal port assessment
 
-Status: reference sources collected and reviewed; no GPU or Metal implementation installed in XNU.
+Status: backend components compiled into XNU; optional power/memory diagnostic temporarily booted. GPU execution and Metal remain unvalidated.
 
 The user has re-enabled Metal in the task scope. Volume buttons are user-confirmed working. The ambiguous GPU/touch report still needs clarification; current code and logs do not demonstrate XNU GPU execution.
 
@@ -18,7 +18,7 @@ Parent revision: UniXNU/UniXNU fb2bb310564ce66779e472a021881cf7c5764919
 
 Reference trees reside in ignored research/cepheus/unixnu-reference on G. Downloads are shallow and non-recursive; Mesa and the full shader toolchains were not downloaded. The unchanged MIT ArmSmmu4K core is now vendored with its license and pinned provenance under drivers/cepheus/third_party.
 
-## Implemented components, not yet connected to XNU
+## Implemented backend components
 
 `drivers/cepheus/adreno640_clock.c` implements A640 HWCG/GBIF sequences with
 separate GPU/GMU register domains and explicit chip/power/quiescence guards.
@@ -43,6 +43,20 @@ at4000,16KiB DTCM at40000 and240KiB DCACHE at44000. Cache IOVAs must resolve
 through owned allocations; they are never CPU pointers. The stock37680-byte
 image passes RAM-callback routing checks, including all seven blocks. No live
 firmware upload, reset release or HFI initialization has been performed.
+
+`gpu_memory_xnu.c` now allocates owned contiguous CPU16K memory, verifies every
+physical page and prepares caches. Its free operation requires the caller to
+prove no live device mappings/references exist. `gpu_probe_xnu.c` is started
+after persistent UFS logging only with `cepheusgpu_probe=1`; it reads the live
+GPUCC GDSC/clock/reset control words without accessing the GPU core. Additional
+`cepheusgpu_memtest=1` allocates two16KiB buffers, builds/walks inactive GPU4K
+tables and frees them without exposing them to a device. This does not validate
+active SMMU translations or GPU coherency.
+
+Full XNU build39584062149 passed atdf1852c. A diagnostic image was temporarily
+booted on the Mi9 with fastboot OKAY; its persistent log still needs collection
+after returning to recovery. Neither a successful XNU probe result nor hardware
+GPU execution is inferred from the bootloader response.
 
 Run `python tools/check-cepheus-a640-clock.py` and
 `python tools/check-cepheus-gpu-tables.py` on Windows LLVM. Both pass host

@@ -4,6 +4,34 @@
 
 ### 2026-10-21: A640 backend components implemented, not activated
 
+LATEST HARDWARE TEST: memory-enabled fullkernel CI39584062149 SUCCESS atdf1852c.
+Both gpu_memory_xnu.c and gpu_probe_xnu.c compilation confirmed in saved
+gpu-reference/ci-gpu-probe-39584062149.log. Downloaded ci-gpu-probe-kernel;
+kernel SHA256 a02b095cf4d826aca911831d36f49ffb4d26ef75eb31b1c27b9b7eabc002fe28
+verified against artifact SHA256SUMS. Probe-only CI39583651860 was superseded/
+cancelled, not a failed hardware test.
+
+Built ISOLATED shim/out/cepheus-gpu-probe/cepheus-xnu-ios-boot.img (18673664B),
+SHA256938874cd5095f92e7feb0d827ee990e73191c6c95ec2b79ba3fdb2c0690d372f.
+build.json records exact args: canonical iOS + sweetfb_noconsole1, touch1,
+keys1, cepheusgpu_probe1, cepheusgpu_memtest1. Existing boot aliases preserved
+using new --output-dir option confined to workspace shim/out.
+TEMPBOOT EXECUTED after actual recovery/productcepheus and unlockedyes checks:
+Sending18236KB OKAY0.399s, BootingOKAY0.161s,total0.569s. No flash commands.
+This confirms bootloader accepted image, NOT XNU/GPU test success.
+Async screen/recovery question pending: user instructed leave20s then return
+recovery. NEXT REQUIRED: collect last4100KiB userdata persistent log and inspect
+CEPHEUS GPU PROBE / CEPHEUS GPU MEMORY lines; no hardware result claimed yet.
+Use existing skip14946047/count1025/bs4096 binary-safe adb exec-out collection.
+
+IMPORTANT POWER QUIRK: gdsc-regulator.c gdsc_qmp_enable sends
+{class: clock, res: gpu_noc_wa} to AOP when CX SW_COLLAPSE still set; simply
+clearing GDSCR is not a qualified replacement. Live QMP provider is
+soc/qcom,qmp-aop@c300000: msgramc300000+1000, IRQ doorbell17c0000c+4 mask1,
+desc offset0, GIC interruptSPI389. Source msm_qmp.c and qmp.h saved from pinned
+Androidtree. No AOP mailbox writes have been made. Need verified link/channel
+handshake and power votes before future CX/GMU startup.
+
 NEW IN PROGRESS: user again orders execution. Recovery confirmed. Collected
 complete live DT read-only to ignored gpu-reference/live-dt-power.tar (27MB),
 3950nodes. CX/GX GDSCRs verified PA2c9106c/2c9100c; CX hwctrl2c91540,

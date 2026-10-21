@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build an offline cepheus CPU probe using LLVM and the original boot DTBs.
+"""Build a cepheus CPU probe or XNU image with LLVM and original boot DTBs.
 
-No flashing or phone access. Output stays under ignored shim/out/. This is
-not an iOS boot image. Bootloader acceptance and framebuffer need validation.
+No flashing or phone access. Output stays under ignored shim/out/.
+XNU payloads may use the guarded iOS userdata root. Hardware boot needs validation.
 """
 import argparse
 import hashlib
@@ -29,6 +29,8 @@ def align(value, page):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--stock-boot', type=Path, required=True)
+    parser.add_argument('--output-dir', type=Path,
+                        help='isolated output directory below shim/out')
     parser.add_argument('--entry-test', action='store_true',
                         help='avoid framebuffer; reboot to fastboot after 5 seconds')
     parser.add_argument('--payload', type=Path,
@@ -117,7 +119,9 @@ def main():
                'cepheus-xnu-ufs-ro' if args.storage_read_only else
                'cepheus-xnu' if xnu_payload else
                'cepheus-entry-probe' if args.entry_test else 'cepheus-probe')
-    out = root / 'shim/out' / variant
+    out = args.output_dir.resolve() if args.output_dir else root / 'shim/out' / variant
+    if not out.is_relative_to((root / 'shim/out').resolve()):
+        parser.error('--output-dir must stay below this workspace shim/out')
     out.mkdir(parents=True, exist_ok=True)
     flags = ['--target=aarch64-none-elf', '-mcpu=cortex-a55', '-O2', '-ffreestanding',
              '-nostdlib', '-fno-pic', '-mgeneral-regs-only', '-mstrict-align',
