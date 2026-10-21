@@ -10,6 +10,7 @@
 #include <kern/sched_prim.h>
 #include <machine/machine_routines.h>
 #include <pexpert/pexpert.h>
+#include "gpu_memory_xnu.h"
 
 extern vm_offset_t ml_io_map(vm_offset_t, vm_size_t);
 extern kern_return_t thread_terminate(thread_t);
@@ -59,6 +60,11 @@ static void gpu_probe_thread(void *arg, wait_result_t result)
         gpucc_read(base, 0x508), gpucc_read(base, 0x540));
     printf("CEPHEUS GPU PROBE: done, no hardware state changed\n");
 out:
+    {
+        int memory_test = 0;
+        if (PE_parse_boot_argn("cepheusgpu_memtest", &memory_test, sizeof(memory_test)) && memory_test == 1)
+            cepheus_gpu_memory_probe();
+    }
     (void)thread_terminate(current_thread());
     thread_block(THREAD_CONTINUE_NULL);
 }

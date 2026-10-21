@@ -20,6 +20,16 @@ Intended next action: build probe kernel, tempboot exact logical-display image,
 collect persistent CEPHEUS GPU PROBE lines once returned to recovery. Do NOT
 claim this diagnostic activates GPU or Metal.
 
+Added real kernel-owned contiguous allocator gpu_memory_xnu.c/.h (max1MiB,
+CPU16K alignment, every pmap physical page checked, candidate36-bit bound),
+physical cache sync via existing UFS-style flush_dcache64. Explicit lifecycle:
+free only with no live mappings/DMA. Optional cepheusgpu_memtest=1 builds and
+walks inactive GPU4K tables using two actual owned16K allocations, syncs and
+frees them without SMMU activation. Both memory and probe files compiled locally
+to actual ARM64 objects using tools/xnu-cc.py and existing kernel buildtree:
+0of2 failures, output research/cepheus/gpu-memory-objects. CI39583651860 probe-
+only revision will be superseded by this memory-enabled revision before boot.
+
 FOLLOW-UP IN PROGRESS: added A640 RSC/PDC power-sequencer programming from
 pinned Android source. Real CMD DB mx30010/cx30000/xo30090 addresses enforced;
 48 writes and final barrier, checks reject missing power/reset prerequisites.
