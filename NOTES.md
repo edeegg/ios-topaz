@@ -5,6 +5,38 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+PANIC PHOTO20261020_200851 pinpoints kmem_alloc(...,14434304,0x100021)
+failed3 @vm_kern.c1178, just after GCC line. 14434304=0xdc4000 is the
+16K-rounded14MB TLMM mapping, NOT GPU failure or hostRAM. Recovered persistent
+research/cepheus/ios-hwcg-panic.bin/.txt total72217 flush27 lackspanic tail;
+pstoreempty,last_kmsgabsent. Fixed0074: four smallverifiedGPIOwindows, total
+20KB requested/80KB16Krounded, versus14MB. Validate GENI firmware BEFORE GPIO
+maps. Added1200ms log checkpoints before nextMMIOphase. Actualarm64object
+compilePASS. Commit5f3a911, CI39519866978 running. NEVER BOOT prior HWCG/keys
+images with largeTLMM mapping again. ButtonsCI39519105259 SUCCESS but contains
+large-mapbug; artifactdownload ci-keys-kernel only forreference, notboot.
+
+GPU user asks investigate realGPU, explicitly DEFER Metal. Actual recovery GPU
+sysfsAdreno640v2,195MHz, frequencies195..810MHz. Added standalone ARM64 Android
+metadata probe tools/cepheus-kgsl-info.c (GETPROPERTY only, no submitted GPU
+commands). Firstopen returned-EAGAIN; recoverydmesg proves missingsqe firmware.
+Copied modem partitionREADONLY335544320bytes to ignoredGPUreference onG,
+SHA2561008d64dd2a56d4920a5700ea2c028a85bb462c5008f46dca89741d6e5138093,
+FATimage lacksGPUfiles. Physicalsde53 is dynamiccontainer, mapper/vendor is
+actualvendor. Mounted mapper/vendor read-only,noload at/tmp/cepheus-vendor-ro;
+contains stocka630_sqe.fw,a640_gmu.bin,a640_zap.*. Copied7GPUfiles to ignored
+stock-gpu-firmware withSHA256manifest. Custom firmware_class path tried then
+RESTORED empty (ueventdignoresit). Bindmounted firmware RO at/vendor/firmware
+(onlyrecoveryRAMmount), GETPROPERTY now SUCCEEDS(open3,ioctl0), chip06040001,
+MMUflag256, GMEM1MiB; gpuid0deprecatedfieldnotidentity. Dmesg confirms GMU/SQE
+loads and a640_zap broughtoutofreset. No GPU execution/rendering claimed, NO
+XNU GPU driver/acceleration yet. Data and sources in gpu-reference. Current
+recovery staysADBconnected. OwnedROmounts may be unmounted before nextboot;
+no stockpartitions modified, no rawMMIO. Metal deferred. Userawaitnextsafeinput
+image with0074+keys; do not claimtouchfixed until realtest.
+
+
+
 HWCG/CONSOLE FIX NOW TEMPORARILY BOOTED: CI39518429772 SUCCESS. Downloaded
 ci-touch-hwcg-kernel; SHA256SUMS verified kernelb427f37ad6731b42819b47d0f9e7495c80999678360c2124a16eda9bb0704b1c.
 Built shim/out/cepheus-touch-hwcg-boot.img (same MAIN cepheus-xnu-ios path)

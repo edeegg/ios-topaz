@@ -13,8 +13,8 @@ The older bring-up entries below describe earlier stages.
 | Console overlay | `_cnputs` mute was insufficient for direct kprintf; patch0070 also gates the framebuffer serial backend, retaining panic display. Physical verification pending. |
 | Red status bar | Logical iPhone X canvas1125x2436 is confirmed in persistent log; panel remains1080x2340. Need user verification of the current image. |
 | Touch | ST FTS521 at I2C0x49 on SE17. First test stopped before chip access on S_AHB HWCG/HALT. Patch0070 follows the Linux clock driver's HWCG exception; new physical test pending. |
-| Buttons | Not ported. Live FDT maps power/volume-down to PM8150 PON; volume-up to PM8150 GPIO6; assistant key to TLMM GPIO97. Requires a reviewed Mi9 SPMI/input implementation. |
-| GPU / Metal | Not implemented. Requires Adreno command/memory/scheduling support and compatible iOS graphics services/userspace; Windows GPU binaries are not XNU drivers. |
+| Buttons | Experimental PM8150 read-only prototype compiled; real test pending. Live FDT maps power/volume-down to PM8150 PON; volume-up to PM8150 GPIO6; assistant key to TLMM GPIO97. Requires a reviewed Mi9 SPMI/input implementation. |
+| GPU / Metal | XNU driver not implemented; Metal explicitly deferred. Recovery KGSL query succeeds with stock firmware: chip06040001, GMEM1MiB. Requires Adreno command/memory/scheduling support and compatible iOS graphics services/userspace; Windows GPU binaries are not XNU drivers. |
 | Wi-Fi | Not implemented; requires SM8150 connectivity power, firmware, bus and network integration. Original Topaz WLAN node intentionally excluded. |
 | Bluetooth | Not implemented; requires transport, controller firmware and iOS interface integration. Launching bluetoothd does not establish hardware support. |
 | Cellular data | Not implemented; modem remoteproc/shared-memory/transport and iOS radio integration remain. Preserve modem/calibration partitions. |
