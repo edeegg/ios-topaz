@@ -5,6 +5,27 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+USER NOW ORDERS GPU AND METAL (revokes earlier Metaldeferral). Reportsvolume
+buttonsworking, ambiguous "GPU e botoes ... agora corrijaGPU"; asyncclarification
+asked touch+volume vs onlyvolume vsGUI+volume. DoNOT inferGPUacceleration or
+workingtouch from thattext. DeviceADBabsent now, no hardwarechanges thisturn.
+NEW PUBLIC GPU/METAL SOURCE CANDIDATE: UniXNU docs/native-adreno shows public
+NativeAdreno+NativeMetal forA740/sheng, realGMU/CP/SMMU/fences, AIR->SPIR-V->
+Turnip. Downloaded pinnedfivecomponents shallow/nonrecursive to ignored
+research/cepheus/unixnu-reference onG, versionsincomponents.json. Parentlicense
+BSD2ClausePatent, componentlicenseskept. NativeAdreno805c7e4,NativeMetal6dcd4cb,
+AdrenoFirmware40fdb8e,AdrenoPM4445f8fe,ArmSmmu4K4d0d659. No Mesa/fulltoolchain
+download. Reviewedactualsource: A740-onlyhwinit+buildA740 andshengGMUinputs;
+NOT compatibleMi9 A640justbyrenaming. NativeMetal is iPadOSplugin; iOS16ABI
+unqualified. GPU4KtablesvsCPU16K requireallocatoradaptation, notautomatickernel
+migration. CEPHEUS-GRAPHICS.md records exactremaininghardware/compiler/runtime
+port and requiredrealexecutionproof. NoGPU/Metalcodeinstalled/compiled or
+workingclaimed. Earlierno-publicdriver appliesONLYios-topazprivateHackiOSwork;
+UniXNUnowprovidesactualpublicalternative. NextworkassessA640backendandnative
+SMMUkit usingverifiedMi9firmware/resources. No fakeIOAccelerator/MTLpublish.
+
+
+
 LATEST USER: touchstillfails, buttonsfail; asks realGPU and upstreamcommitaudit.
 User returnedrecovery after initialADBabsent. Read research/cepheus/
 ios-smallmap-result.bin/.txt: SWEETLOG193654bytes flush146; noallocationpanic.
