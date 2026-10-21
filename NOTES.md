@@ -5,6 +5,36 @@
 ### Latest: actual XNU console build for cepheus (2026-10-20)
 
 
+LATEST USER: touchstillfails, buttonsfail; asks realGPU and upstreamcommitaudit.
+User returnedrecovery after initialADBabsent. Read research/cepheus/
+ios-smallmap-result.bin/.txt: SWEETLOG193654bytes flush146; noallocationpanic.
+GENI firmwareALREADYLOADED fw0303 proto3, status0, tx20102964 rx20104900;
+FIFO checks fail because GENI_IF_FIFO_DISABLE_RO at64bit0=1. Correct32bitwords/
+16worddepth are present, so previous genericneedfirmware message misleading.
+Actual Android i2c-qcom-geni.c1160 selectsGSI_ONLY when thatregister!=0.
+Must implement GPI DMA + SMMU transport; do NOT clearread-onlybit or simply
+removeguard. LiveGPI provider c00000+60000, maxgpii13,maskfa, streamSID7b6,
+SMMUcfg1=ATTACH (NOTbypass), IOVA100000+100000. Sourcegpi.c84862bytes and
+msm_gpi_mmio.h9321bytes downloaded from pinnedAndroidcommit; savedtouch-reference.
+Firstinputtesthadkeys0explicitlydisabled, NOT a failedenabledkeysdriver.
+NOW keys1smallmap0759628c... TEMPORARILY BOOTED afterrecoverycepheusconfirmed,
+bootloaderproductcepheus/unlockedyes. SendingOKAY0.394s BootingOKAY0.135s,
+total0.541s. This is0074 safeGPIOimage+experimentalPM8150buttons1. Await60s
+power/volume feedback, then recoverylog needed for CEPHEUS KEYS arb/version/APID.
+Touchstillunsupportedtransport inthisimage; no falsefixclaims.
+
+UPSTREAM AUDIT: gitfetchorigin topaz3eacb48->89451b8. Newpublic0131-0139
+IOSurfacecorrectness andemptyIOAcceleratorES0138; NOT realGPU driver. README
+commits18ae368,2e23984,89451b8 explicitlystateCPUrenderinginpublictree and
+GPUworkusesprivateHackiOSpatches, publishedonlyafterHackiOSsource release.
+Do NOT addemptyIOAcceleratorESandclaimGPUworks. Mi9Adreno640stillrequires
+ownGMU/SMMU/power/driveranduserspace port. Existingrecoveryfirmwarebaseline
+notXNUacceleration. PublicupstreamtouchFT5452/TopazFIFOclocksarenotMi9FTS/GPI.
+Metalremainsdeferred. Nootherhardwarefixedyet. Preserveuserdatawriteguard,
+boot-onlykerneltest, allnewresearchonG, noWSL, nosensitivefirmwaregitcommits.
+
+
+
 SMALL-MAP INPUT KERNEL CI39519866978 SUCCESS. SHA256SUMS verified fullkernel
 3612f9b5bcda0e7a51c5dc8fd762a83e598348204490723b7da3ec7e22d975bf at
 research/cepheus/ci-input-smallmap-kernel/kernel.development.sweet.
