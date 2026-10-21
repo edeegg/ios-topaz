@@ -22,6 +22,25 @@ def gpu_backend_patch(root):
         patch += (f'--- /dev/null\n+++ b/{target}\n'
                   f'@@ -0,0 +1,{len(lines)} @@\n' +
                   ''.join('+' + line + '\n' for line in lines))
+    patch += '''--- a/bsd/dev/sweet_ufs.c
++++ b/bsd/dev/sweet_ufs.c
+@@ -47,5 +47,6 @@
+ extern int hz;
+ static void sweet_log_start(void);
+ extern void sweet_sample_start(void);
+ extern void cepheus_touch_init(void);
++extern void cepheus_gpu_probe_init(void);
+'''
+    patch += ' \n'
+    patch += '''\
+@@ -606,5 +607,6 @@
+ \tsweet_log_start();
+ \tsweet_sample_start();
+ \tcepheus_touch_init();
++\tcepheus_gpu_probe_init();
+ \treturn 0;
+ }
+'''
     return patch
 
 

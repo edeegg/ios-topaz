@@ -4,6 +4,22 @@
 
 ### 2026-10-21: A640 backend components implemented, not activated
 
+NEW IN PROGRESS: user again orders execution. Recovery confirmed. Collected
+complete live DT read-only to ignored gpu-reference/live-dt-power.tar (27MB),
+3950nodes. CX/GX GDSCRs verified PA2c9106c/2c9100c; CX hwctrl2c91540,
+GX domain2c91508 and GX reset2c91008. CX parentpm8150l_s6_level/ph20;
+GX parentpm8150l_s2_level/ph23. Saved live-power-supplies.json. Exact pinned
+gdsc driver is drivers/clk/qcom/gdsc-regulator.c (not drivers/regulator);
+PWR_ONbit31,HW_CONTROLbit1,SW_COLLAPSEbit0. Saved source in gpu-reference.
+Added gpu_probe_xnu.c: opt-in cepheusgpu_probe=1, delayed worker started after
+persistent UFS log setup, maps onlyGPUCC2c91000+1000 and READS documented
+clock/reset/domain words. No GPU/GMU core mapping, MMIO writes, DMA or reset.
+Generated0075 now starts this optional probe after touch init. Patch applies
+against keys-patch-check + sweet_ufs copied from touch-integration. CI pending.
+Intended next action: build probe kernel, tempboot exact logical-display image,
+collect persistent CEPHEUS GPU PROBE lines once returned to recovery. Do NOT
+claim this diagnostic activates GPU or Metal.
+
 FOLLOW-UP IN PROGRESS: added A640 RSC/PDC power-sequencer programming from
 pinned Android source. Real CMD DB mx30010/cx30000/xo30090 addresses enforced;
 48 writes and final barrier, checks reject missing power/reset prerequisites.
