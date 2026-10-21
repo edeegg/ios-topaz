@@ -12,7 +12,23 @@ CM3 firmware/HFI boot and is not called on live hardware yet.
 stage-xnu-patches.py now generates0075 for cepheus-ios only, compiling clock,
 GMU and page-table backend files into XNU. Generated patch git apply --check
 PASS against local keys-patch-check source. Workflow watches backend sources.
-Full CI build about to be submitted; record result before stopping.
+CI39581338754 for e30fd38: Build step SUCCESS at10:04:42UTC (fullkernel),
+artifact packaging was still running at last check. Final result below pending.
+
+FOLLOW-UP: bounded adreno640_mmio.c added; true GPU-global DWORD1a800 is GMU
+mapping start. Bounds, short mappings, separated PDC apertures and barrier
+failure tests PASS; ARM64 compile PASS. No platform mapping or activation yet.
+AdrenoFirmware core40fdb8e vendored unchanged with BSD patent license;
+adreno640_firmware.c validates complete image then routes TCM words vs cache
+IOVA blocks, with reset-held requirement. Stock37680-byte image7blocks passes
+RAM callback routing tests; malformed tail produces ZERO I/O. It is NOT loaded
+onto real GMU by these tests. Synthetic tests and ARM64 compiles PASS.
+Fetched pinned kgsl_gmu.c/.h and kgsl_gmu_core.c/.h into ignored gpu-reference;
+verified ITCM0+4000,ICACHE4000+3c000,DTCM40000+4000,DCACHE44000+3c000.
+Do not confuse cache-backed firmware with additional physical TCM.
+Live DT also confirms KGSL SMMU2ca0000+10000,3-level tables,skip-init,
+gfxuser stream0 flags401,GMUuser4/kernel5 flags400; no live SMMU writes made.
+New MMIO/firmware objects to be included by next CI revision.
 
 ADB confirms f105aefc recovery and ro.product.device=cepheus. Read-only KGSL
 sysfs reports Adreno640v2 and runtime_status=suspended. No boot, flash or root

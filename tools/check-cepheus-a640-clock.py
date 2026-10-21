@@ -38,6 +38,7 @@ def main():
         raise SystemExit('This runner uses Windows LLVM/lld-link; the C component is portable.')
     check_component('clock')
     check_component('gmu')
+    check_component('mmio')
     print('Hardware execution and GPU/Metal support are NOT validated by this check.')
 
 

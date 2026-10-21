@@ -26,12 +26,33 @@ separate GPU/GMU register domains and explicit chip/power/quiescence guards.
 caller-owned physical memory and an explicitly verified output address width.
 Neither component activates hardware or publishes an accelerator service.
 
+The cepheus-ios build now stages these sources as XNU BSD objects through
+generated patch0075. Other board builds do not include this backend.
+`adreno640_gmu.c` programs A640 RSC/PDC sequencing using the Mi9 CMD DB addresses;
+it requires externally verified CX/clocks/reset-held/exclusive prerequisites.
+`adreno640_mmio.c` translates global GMU DWORD indices from1a800 and bounds
+accesses against the actual separate apertures. Mapping, power and real device
+barriers remain platform responsibilities.
+
+`adreno640_firmware.c` validates the complete GMU image before routing TCM words
+and cache blocks. Its verified Android layout is16KiB ITCM at0,240KiB ICACHE
+at4000,16KiB DTCM at40000 and240KiB DCACHE at44000. Cache IOVAs must resolve
+through owned allocations; they are never CPU pointers. The stock37680-byte
+image passes RAM-callback routing checks, including all seven blocks. No live
+firmware upload, reset release or HFI initialization has been performed.
+
 Run `python tools/check-cepheus-a640-clock.py` and
 `python tools/check-cepheus-gpu-tables.py` on Windows LLVM. Both pass host
 behavior tests and compile actual ARM64/iOS objects. The table test walks
 translations above4GiB and rejects overlapping table memory, insufficient leaf
 budgets and misaligned CPU allocations. These are component tests, not proof
 of GPU execution, coherent SMMU walks or Metal support.
+
+`python tools/check-cepheus-gmu-firmware.py` tests firmware validation and upload
+routing using synthetic input. Pass `--stock-firmware PATH` to additionally
+validate an existing local stock image without committing it or writing it to
+hardware. The unchanged AdrenoFirmware core is vendored with its BSD patent
+license and pinned provenance.
 
 ## Required adaptations
 
